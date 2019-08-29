@@ -17,21 +17,37 @@ import com.hapi.player.video.floating.Floating
 class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
 
 
+    /**
+     * wrap content 高度下的 宽高比
+     */
+    companion object {
+        private const val DEFAULT_HEIGHT_RATIO = (36F / 64)
+
+    }
+
+    private var defaultHeightRatio = DEFAULT_HEIGHT_RATIO
     private lateinit var mContainer: FrameLayout
     private lateinit var mFloating: Floating
     private lateinit var mTextureView: HappyTextureView
     private lateinit var mSurface: Surface
     private lateinit var mPlayerEngine: IPlayerEngine
-
     private var mSurfaceTexture: SurfaceTexture? = null
 
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+
+        attrs?.let {
+            var typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
+            typedArray?.apply {
+                defaultHeightRatio = getFloat(R.styleable.happyVideo_defaultHeightRatio, DEFAULT_HEIGHT_RATIO)
+            }
+        }
         init()
     }
 
     private var mCurrentMode = MODE_NORMAL
+
 
     private fun init() {
         mContainer = FrameLayout(context)
@@ -53,7 +69,6 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
 
         VideoPlayerManager.instance().currentVideoPlayer = this
     }
-
 
 
     override fun startPlay(uir: Uri, headers: Map<String, String>?, position: Int, loop: Boolean, cache: Boolean) {
@@ -207,21 +222,10 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
     }
 
 
-
-
-
     private val mOnVideoSizeChangedListener = MediaPlayer.OnVideoSizeChangedListener { mp, width, height ->
         mTextureView.adaptVideoSize(width, height)
         LogUtil.d("onVideoSizeChanged ——> width：$width， height：$height")
     }
-
-
-
-
-
-
-
-
 
 
     override fun pause() {
@@ -327,4 +331,24 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
         return mPlayerEngine.getCurrentUrl()
     }
 
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+
+        // 获取宽-测量规则的模式和大小
+        val widthMode = View.MeasureSpec.getMode(widthMeasureSpec)
+        val widthSize = View.MeasureSpec.getSize(widthMeasureSpec)
+
+        // 获取高-测量规则的模式和大小
+        val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
+        val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
+
+
+        // 高度为warpcontent 正常模式
+        if (layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT || isNormal()) {
+            val sizeH = widthSize * defaultHeightRatio
+            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
+        } else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        }
+    }
 }

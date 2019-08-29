@@ -7,4 +7,13 @@
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:windowBackground">@color/dialog_bg</item>
     </style>
+
+
+
+
+    <declare-styleable name="happyVideo">
+        <attr name="defaultHeightRatio" format="float" />
+    </declare-styleable>
+
+
 </resources>
