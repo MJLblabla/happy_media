@@ -12,17 +12,16 @@ import android.widget.FrameLayout
 import com.hapi.player.*
 import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
+import com.hapi.player.video.contronller.IController
 import com.hapi.player.video.floating.Floating
 
 class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
-
 
     /**
      * wrap content 高度下的 宽高比
      */
     companion object {
         private const val DEFAULT_HEIGHT_RATIO = (36F / 64)
-
     }
 
     private var defaultHeightRatio = DEFAULT_HEIGHT_RATIO
@@ -32,6 +31,9 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
     private lateinit var mSurface: Surface
     private lateinit var mPlayerEngine: IPlayerEngine
     private var mSurfaceTexture: SurfaceTexture? = null
+
+
+    private var mController: IController? = null
 
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -71,13 +73,29 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
     }
 
 
+
+    override fun addController(controller: IController) {
+        mController = controller
+        controller.attach(this)
+        mContainer.addView(controller.getView())
+        setListener(controller,true)
+
+    }
+
+
     override fun startPlay(uir: Uri, headers: Map<String, String>?, position: Int, loop: Boolean, cache: Boolean) {
+        mController?.reset()
         mPlayerEngine.startPlay(uir, headers, position, loop, cache)
+
     }
 
     override fun startPlayFromLastPosion(uir: Uri, headers: Map<String, String>?, loop: Boolean, cache: Boolean) {
+        mController?.reset()
         mPlayerEngine.startPlayFromLastPosion(uir, headers, loop, cache)
+
     }
+
+
 
     override fun setListener(lister: PlayerStatusListener, add: Boolean) {
         mPlayerEngine.setListener(lister, add)
@@ -174,8 +192,8 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
 
             // 小窗口的宽度为屏幕宽度的60%，长宽比默认为16:9，右边距、下边距为8dp。
             val params = FrameLayout.LayoutParams(
-                (PalyerUtil.getScreenWidth(context) * 0.6f) as Int,
-                (PalyerUtil.getScreenWidth(context) * 0.6f * 9f / 16f) as Int
+                (PalyerUtil.getScreenWidth(context) * 0.6f).toInt(),
+                (PalyerUtil.getScreenWidth(context) * 0.6f * defaultHeightRatio ).toInt()
             )
             params.gravity = Gravity.BOTTOM or Gravity.END
             params.rightMargin = PalyerUtil.dp2px(context, 8f)
@@ -269,12 +287,17 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
         mPlayerEngine.releasePlayer()
         mSurfaceTexture?.release()
         VideoPlayerManager.instance().releaseVideoPlayer()
+        mController?.detach()
     }
 
     override fun onSurfaceTextureAvailable(p0: SurfaceTexture?, p1: Int, p2: Int) {
         mSurfaceTexture = p0
         mSurface = Surface(mSurfaceTexture)
         mPlayerEngine.setSurface(mSurface)
+    }
+
+    override fun getBufferPercentage(): Int {
+        return mPlayerEngine.getBufferPercentage()
     }
 
 
@@ -330,6 +353,8 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
     override fun getCurrentUrl(): Uri? {
         return mPlayerEngine.getCurrentUrl()
     }
+
+
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

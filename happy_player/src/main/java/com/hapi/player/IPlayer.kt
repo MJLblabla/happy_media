@@ -31,6 +31,7 @@ interface IPlayer {
 
     fun getCurrentPlayStatus(): Int
 
+    fun getBufferPercentage():Int
 
     /**
      * 获取最大音量

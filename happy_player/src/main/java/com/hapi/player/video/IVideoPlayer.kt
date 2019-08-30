@@ -1,10 +1,14 @@
 package com.hapi.player.video
 
 import com.hapi.player.IPlayer
+import com.hapi.player.video.contronller.IController
 
 interface IVideoPlayer : IPlayer {
 
 
+
+
+    fun addController(controller: IController)
     /**
      * 窗口模式
      */

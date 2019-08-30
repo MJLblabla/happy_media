@@ -3,6 +3,7 @@ package com.pince.happy_media
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.hapi.player.video.contronller.DefaultController
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+        mHappyVideoPlayer.addController(DefaultController(this))
 
         b2.setOnClickListener {
             mHappyVideoPlayer.startPlay(Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"))

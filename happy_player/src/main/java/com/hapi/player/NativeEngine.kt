@@ -5,6 +5,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.view.Surface
+import com.hapi.player.PlayerStatus.*
 import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
 import com.hapi.player.video.VideoPlayerManager
@@ -13,6 +14,8 @@ import com.hapi.player.video.VideoPlayerManager
  * 原生播放引擎
  */
 class NativeEngine(private val context: Context) : IPlayerEngine() {
+
+
 
 
     private var mCurrentState = STATE_IDLE
@@ -163,6 +166,9 @@ class NativeEngine(private val context: Context) : IPlayerEngine() {
         return mMediaPlayer.duration.toLong()
     }
 
+    override fun getBufferPercentage(): Int {
+       return mBufferPercentage
+    }
 
     override fun getCurrentPosition(): Long {
         return mMediaPlayer.currentPosition.toLong()
