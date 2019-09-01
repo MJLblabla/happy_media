@@ -1,5 +1,6 @@
 package com.hapi.player
 
+import android.content.Context
 import android.net.Uri
 
 interface IPlayer {
@@ -8,9 +9,8 @@ interface IPlayer {
 
     fun getCurrentUrl():Uri?
 
-    fun startPlay(uir: Uri,  headers :Map<String, String> ?=null,position: Int = 0, loop: Boolean = false, cache: Boolean = false)
-
-    fun startPlayFromLastPosion(uir: Uri, headers :Map<String, String>?=null,loop: Boolean = false, cache: Boolean = false)
+    fun startPlay(uir: Uri, headers :Map<String, String> ?=null, loop: Boolean = false,fromLastPosition :Boolean = false)
+    fun startPlayWithCache(uir: Uri,context: Context, headers :Map<String, String> ?=null, loop: Boolean = false,fromLastPosition :Boolean = false)
 
     fun setListener(lister: PlayerStatusListener,add: Boolean)
     fun pause()

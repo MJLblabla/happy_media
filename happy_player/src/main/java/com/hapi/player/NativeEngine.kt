@@ -8,19 +8,16 @@ import android.view.Surface
 import com.hapi.player.PlayerStatus.*
 import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
-import com.hapi.player.video.VideoPlayerManager
 
 /**
  * 原生播放引擎
  */
-class NativeEngine(private val context: Context) : IPlayerEngine() {
+class NativeEngine(private val context: Context) : AbsPlayerEngine() {
 
-
-
+    private var mUrl:Uri?=null
 
     private var mCurrentState = STATE_IDLE
 
-    private var skipToPosition: Int = 0
     private var continueFromLastPosition = false
     private var mBufferPercentage: Int = 0
     private var mHeaders: Map<String, String>? = null
@@ -74,9 +71,11 @@ class NativeEngine(private val context: Context) : IPlayerEngine() {
     }
 
 
-    override fun startPlay(uir: Uri, headers: Map<String, String>?, position: Int, loop: Boolean, cache: Boolean) {
+
+
+    override fun playAfterDealUrl(uir: Uri, headers: Map<String, String>?, loop: Boolean, fromLastPosition: Boolean) {
         mUrl = uir
-        skipToPosition = position
+        continueFromLastPosition = fromLastPosition
         mMediaPlayer.isLooping = loop
         mHeaders = headers
         openMedia()
@@ -88,6 +87,7 @@ class NativeEngine(private val context: Context) : IPlayerEngine() {
         mPlayerStatusListener.onPlayStateChanged(mCurrentState)
 
         try {
+            savePotion()
             pause()
             mMediaPlayer.stop()
             mMediaPlayer.reset()
@@ -102,12 +102,16 @@ class NativeEngine(private val context: Context) : IPlayerEngine() {
     }
 
 
-    override fun startPlayFromLastPosion(uir: Uri, headers: Map<String, String>?, loop: Boolean, cache: Boolean) {
-        startPlay(uir, headers, 0, loop, cache)
+    private fun savePotion(){
+        if (isPlaying() || isBufferingPlaying() || isBufferingPaused() || isPaused()) {
+            PalyerUtil.savePlayPosition(context, mUrl?.path, getCurrentPosition().toInt())
+        } else if (isCompleted()) {
+            PalyerUtil.savePlayPosition(context, mUrl?.path, 0)
+        }
     }
 
-
     override fun pause() {
+
         if (mCurrentState == STATE_PLAYING) {
             mMediaPlayer.pause()
             mCurrentState = STATE_PAUSED
@@ -167,7 +171,7 @@ class NativeEngine(private val context: Context) : IPlayerEngine() {
     }
 
     override fun getBufferPercentage(): Int {
-       return mBufferPercentage
+        return mBufferPercentage
     }
 
     override fun getCurrentPosition(): Long {
@@ -180,11 +184,7 @@ class NativeEngine(private val context: Context) : IPlayerEngine() {
         mAudioManager.abandonAudioFocus(audioFocusChangeListener)
         mMediaPlayer.release()
         mPlayerStatusListener.onPlayStateChanged(mCurrentState)
-        if (isPlaying() || isBufferingPlaying() || isBufferingPaused() || isPaused()) {
-            PalyerUtil.savePlayPosition(context, mUrl.toString(), getCurrentPosition().toInt())
-        } else if (isCompleted()) {
-            PalyerUtil.savePlayPosition(context, mUrl.toString(), 0)
-        }
+        savePotion()
 
         Runtime.getRuntime().gc()
     }
@@ -198,20 +198,19 @@ class NativeEngine(private val context: Context) : IPlayerEngine() {
         // 从上次的保存位置播放
         if (continueFromLastPosition) {
             val savedPlayPosition = PalyerUtil.getSavedPlayPosition(context, mUrl?.path)
-            mp.seekTo(savedPlayPosition.toInt())
+             if(savedPlayPosition>0){
+                 mp.seekTo(savedPlayPosition.toInt())
+             }
         }
-        // 跳到指定位置播放
-        if (skipToPosition != 0) {
-            mp.seekTo(skipToPosition)
-        }
+
     }
 
     private val mOnCompletionListener = MediaPlayer.OnCompletionListener {
         mCurrentState = STATE_COMPLETED
         mPlayerStatusListener.onPlayStateChanged(mCurrentState)
+        savePotion()
         LogUtil.d("onCompletion ——> STATE_COMPLETED")
-        // 清除屏幕常亮
-        //  mContainer.setKeepScreenOn(false)
+
     }
 
 

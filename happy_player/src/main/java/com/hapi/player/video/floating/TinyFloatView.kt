@@ -87,18 +87,15 @@ class TinyFloatView : FrameLayout {
         if(x==0f && y==0f){
             return
         }
-
         translationX += x
         translationY +=y
-//        val lp = layoutParams
-//        if(lp is FrameLayout.LayoutParams){
-//
-//            lp.topMargin= (lp.topMargin+y).toInt()
-//            lp.leftMargin = (lp.leftMargin+x).toInt()
-//            layoutParams = lp
-//            requestLayout()
-//        }
+    }
 
+
+
+    fun resetTranslation(){
+        translationX  = 0f
+        translationY  =0f
     }
 
 

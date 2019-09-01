@@ -35,11 +35,11 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
      */
     private var videoHeightRatio = DEFAULT_HEIGHT_RATIO
 
-    private lateinit var mContainer: FrameLayout
+    private lateinit var mContainer: TinyFloatView
     private lateinit var mFloating: Floating
     private lateinit var mTextureView: HappyTextureView
     private lateinit var mSurface: Surface
-    private lateinit var mPlayerEngine: IPlayerEngine
+    private lateinit var mPlayerEngine: AbsPlayerEngine
     private var mSurfaceTexture: SurfaceTexture? = null
 
 
@@ -93,17 +93,20 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
 
     }
 
-
-    override fun startPlay(uir: Uri, headers: Map<String, String>?, position: Int, loop: Boolean, cache: Boolean) {
+    override fun startPlay(uir: Uri, headers: Map<String, String>?, loop: Boolean, fromLastPosition: Boolean) {
         mController?.reset()
-        mPlayerEngine.startPlay(uir, headers, position, loop, cache)
-
+        mPlayerEngine.startPlay(uir, headers, loop, fromLastPosition)
     }
 
-    override fun startPlayFromLastPosion(uir: Uri, headers: Map<String, String>?, loop: Boolean, cache: Boolean) {
+    override fun startPlayWithCache(
+        uir: Uri,
+        context: Context,
+        headers: Map<String, String>?,
+        loop: Boolean,
+        fromLastPosition: Boolean
+    ) {
         mController?.reset()
-        mPlayerEngine.startPlayFromLastPosion(uir, headers, loop, cache)
-
+        mPlayerEngine.startPlayWithCache(uir, context, headers, loop, fromLastPosition)
     }
 
 
@@ -175,7 +178,7 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
         if (mCurrentMode == MODE_TINY_WINDOW) {
             return
         }
-        enterTinyWindowSmooth(false)
+        enterTinyWindowSmooth(true)
 
     }
 
@@ -223,7 +226,6 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
     override fun exitTinyWindow(): Boolean {
         if (mCurrentMode == MODE_TINY_WINDOW) {
             mFloating.clear()
-
             val contentView = PalyerUtil.scanForActivity(context)
                 .findViewById(android.R.id.content) as ViewGroup
             contentView.removeView(mContainer)
@@ -231,7 +233,9 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
+
             this.addView(mContainer, params)
+            mContainer.resetTranslation()
             mCurrentMode = MODE_NORMAL
             mPlayerEngine.mPlayerStatusListener.onPlayModeChanged(mCurrentMode)
             LogUtil.d("MODE_NORMAL")
