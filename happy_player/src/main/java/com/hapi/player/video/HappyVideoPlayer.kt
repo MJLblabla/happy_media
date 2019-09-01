@@ -17,7 +17,7 @@ import com.hapi.player.video.contronller.IController
 import com.hapi.player.video.floating.Floating
 import com.hapi.player.video.floating.TinyFloatView
 
-class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
+open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
 
     /**
      * wrap content 高度下的 宽高比
@@ -307,13 +307,6 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
         mSurfaceTexture?.release()
         VideoPlayerManager.instance().releaseVideoPlayer()
         mController?.detach()
-    }
-
-
-    override fun onDetachedFromWindow() {
-        releasePlayer()
-        super.onDetachedFromWindow()
-        LogUtil.d("onDetachedFromWindow")
     }
 
     override fun onSurfaceTextureAvailable(p0: SurfaceTexture?, p1: Int, p2: Int) {
