@@ -95,14 +95,14 @@ public class DefaultController extends FrameLayout implements IController, View.
     public DefaultController(@NonNull Context context) {
         super(context);
         mContext = context;
-        this.setOnTouchListener(this);
+     //   this.setOnTouchListener(this);
         init();
     }
 
     public DefaultController(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
-        this.setOnTouchListener(this);
+       // this.setOnTouchListener(this);
         init();
     }
 
@@ -243,6 +243,11 @@ public class DefaultController extends FrameLayout implements IController, View.
                 mNeedChangeBrightness = false;
                 break;
             case MotionEvent.ACTION_MOVE:
+
+                if(mPlayer.isTinyWindow()){
+                    return false;
+                }
+
                 float deltaX = x - mDownX;
                 float deltaY = y - mDownY;
                 float absDeltaX = Math.abs(deltaX);

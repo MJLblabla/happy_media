@@ -10,10 +10,12 @@ import android.util.AttributeSet
 import android.view.*
 import android.widget.FrameLayout
 import com.hapi.player.*
+import com.hapi.player.PlayerStatus.*
 import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
 import com.hapi.player.video.contronller.IController
 import com.hapi.player.video.floating.Floating
+import com.hapi.player.video.floating.TinyFloatView
 
 class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
 
@@ -24,7 +26,15 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
         private const val DEFAULT_HEIGHT_RATIO = (36F / 64)
     }
 
+    /*
+     wrap content 高度下的 宽高比
+     */
     private var defaultHeightRatio = DEFAULT_HEIGHT_RATIO
+    /**
+     * 获取到视频宽高后的　宽高比
+     */
+    private var videoHeightRatio = DEFAULT_HEIGHT_RATIO
+
     private lateinit var mContainer: FrameLayout
     private lateinit var mFloating: Floating
     private lateinit var mTextureView: HappyTextureView
@@ -52,7 +62,8 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
 
 
     private fun init() {
-        mContainer = FrameLayout(context)
+        mContainer = TinyFloatView(context)
+        (  mContainer as TinyFloatView ).parentWindType = {mCurrentMode}
         mContainer.setBackgroundColor(Color.BLACK)
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -174,7 +185,7 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
         }
 
         if (flag) {
-            mFloating.start(mContainer, object : Floating.OnFloatingDelegate {
+            mFloating.start(videoHeightRatio,mContainer, object : Floating.OnFloatingDelegate {
                 override fun onAninmationEnd() {
                     mCurrentMode = MODE_TINY_WINDOW
                     mPlayerEngine.mPlayerStatusListener.onPlayModeChanged(mCurrentMode)
@@ -191,9 +202,10 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
                 .findViewById(Window.ID_ANDROID_CONTENT) as ViewGroup
 
             // 小窗口的宽度为屏幕宽度的60%，长宽比默认为16:9，右边距、下边距为8dp。
+            val w =        (PalyerUtil.getScreenWidth(context) * 0.6f).toInt()
             val params = FrameLayout.LayoutParams(
-                (PalyerUtil.getScreenWidth(context) * 0.6f).toInt(),
-                (PalyerUtil.getScreenWidth(context) * 0.6f * defaultHeightRatio ).toInt()
+                w ,
+                (w * videoHeightRatio ).toInt()
             )
             params.gravity = Gravity.BOTTOM or Gravity.END
             params.rightMargin = PalyerUtil.dp2px(context, 8f)
@@ -241,7 +253,10 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
 
 
     private val mOnVideoSizeChangedListener = MediaPlayer.OnVideoSizeChangedListener { mp, width, height ->
-        mTextureView.adaptVideoSize(width, height)
+        if(width>0&&height>0){
+            videoHeightRatio=height.toFloat()/width
+            mTextureView.adaptVideoSize(width, height)
+        }
         LogUtil.d("onVideoSizeChanged ——> width：$width， height：$height")
     }
 
@@ -288,6 +303,13 @@ class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureLi
         mSurfaceTexture?.release()
         VideoPlayerManager.instance().releaseVideoPlayer()
         mController?.detach()
+    }
+
+
+    override fun onDetachedFromWindow() {
+        releasePlayer()
+        super.onDetachedFromWindow()
+        LogUtil.d("onDetachedFromWindow")
     }
 
     override fun onSurfaceTextureAvailable(p0: SurfaceTexture?, p1: Int, p2: Int) {

@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.res.Resources;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -172,4 +174,39 @@ public class PalyerUtil {
     public static void floating(View anchor, View target){
 
     }
+
+
+
+    /**
+     * 得到设备屏幕的宽度
+     */
+    public static int getScreenWidth() {
+        return getScreenSize()[0];
+    }
+
+    /**
+     * 得到设备屏幕的高度
+     */
+    public static int getScreenHeight() {
+        return getScreenSize()[1];
+    }
+
+    /**
+     * 获取屏幕尺寸
+     *
+     * @return 数组 0：宽度， 1：高度
+     */
+    public static int[] getScreenSize() {
+        DisplayMetrics displayMetrics = getDisplayMetrics();
+        return new int[]{displayMetrics.widthPixels, displayMetrics.heightPixels};
+    }
+    /**
+     * 获取屏幕尺寸与密度.
+     *
+     * @return mDisplayMetrics
+     */
+    public static DisplayMetrics getDisplayMetrics() {
+        return Resources.getSystem().getDisplayMetrics();
+    }
+
 }

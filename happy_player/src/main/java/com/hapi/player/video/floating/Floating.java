@@ -25,7 +25,7 @@ public class Floating {
         this.mActivity = activity;
     }
 
-    public void start(final View anchor, final OnFloatingDelegate delegate) {
+    public void start(float videoHeightRatio,final View anchor, final OnFloatingDelegate delegate) {
         ViewGroup rootView = (ViewGroup) mActivity.findViewById(Window.ID_ANDROID_CONTENT);
         int[] location = new int[2];
         rootView.getLocationOnScreen(location);
@@ -46,8 +46,11 @@ public class Floating {
         int screenWidth = PalyerUtil.getScreenWidth(mActivity);
         int scrrenHeight = PalyerUtil.getScreenHeight(mActivity);
         int padding = PalyerUtil.dp2px(mActivity, 8f);
+
         final int targetWidth = (int) (screenWidth * 0.6f);
-        final int targetHeight = (int) (screenWidth * 0.6f * 9f / 16f);
+        final int targetHeight = (int) (targetWidth* videoHeightRatio);
+
+
         final int anchorWidth = anchor.getWidth();
         final int anchorHeight = anchor.getHeight();
         Rect rectTarget = new Rect(
