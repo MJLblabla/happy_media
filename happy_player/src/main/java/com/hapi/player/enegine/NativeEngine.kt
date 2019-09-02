@@ -15,7 +15,6 @@ import com.hapi.player.utils.PalyerUtil
  */
 internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
 
-
     private var mUrl: Uri? = null
 
     private var mCurrentState = STATE_IDLE
@@ -46,12 +45,15 @@ internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
      */
     private val mAudioManager: AudioManager by lazy {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.requestAudioFocus(
+        audioManager
+    }
+
+    private fun reqestFouces(){
+        mAudioManager.requestAudioFocus(
             audioFocusChangeListener,
             AudioManager.STREAM_MUSIC,
             AudioManager.AUDIOFOCUS_GAIN
         )
-        audioManager
     }
 
     private var audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener =
@@ -84,6 +86,38 @@ internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
         mHeaders = headers
         openMedia()
     }
+
+
+
+    override fun setUpAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
+
+        mUrl = uir
+        mHeaders = headers
+        isPreLoading = preLoading
+        if(isPreLoading){
+            openMedia()
+        }
+    }
+
+
+    override fun startPlay() {
+
+        if (isPreLoading && mCurrentState == STATE_PREPARED) {
+            startCall.invoke()
+            isPreLoading = false
+            return
+        }
+        if(isPreLoading){
+            isPreLoading = false
+            return
+        }
+
+
+        openMedia()
+
+
+    }
+
 
     private fun openMedia() {
         mCurrentState = STATE_PREPARING
@@ -193,6 +227,7 @@ internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
     }
 
     private val startCall = {
+        reqestFouces()
         mMediaPlayer.start()
         // 从上次的保存位置播放
         if (continueFromLastPosition) {
@@ -215,13 +250,6 @@ internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
             startCall.invoke()
         }
 
-    }
-
-    override fun noticePreLoading() {
-        if (isPreLoading && mCurrentState == STATE_PREPARED) {
-            startCall.invoke()
-        }
-        isPreLoading = false
     }
 
 

@@ -10,7 +10,7 @@
 
 
     <declare-styleable name="happyVideo">
-        <attr name="defaultHeightRatio" format="float"/>
+        <attr name="heightRatio" format="float"/>
         <attr name="loop" format="boolean"/>
         <attr name="isFromLastPosition" format="boolean"/>
         <attr name="isUseCache" format="boolean"/>

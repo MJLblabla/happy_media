@@ -8,7 +8,8 @@ interface IVideoPlayer : IPlayer {
 
 
 
-    fun startPlay(uir: Uri, headers :Map<String, String> ?=null,cover:Uri, preLoading:Boolean = false)
+    fun setUp(uir: Uri, headers :Map<String, String> ?=null,cover:Uri, preLoading:Boolean = false)
+
 
     /**
      * 设置背景

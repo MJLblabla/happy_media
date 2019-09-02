@@ -25,6 +25,7 @@ import com.bumptech.glide.request.RequestOptions
 open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
 
 
+
     /**
      * wrap content 高度下的 宽高比
      */
@@ -36,11 +37,11 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     /*
      wrap content 高度下的 宽高比
      */
-    private var defaultHeightRatio = DEFAULT_HEIGHT_RATIO
+    private var defaultHeightRatio = 0f
     /**
      * 获取到视频宽高后的　宽高比
      */
-    private var videoHeightRatio = DEFAULT_HEIGHT_RATIO
+    private var videoHeightRatio = 0f
 
     private lateinit var mContainer: TinyFloatView
     private lateinit var mFloating: Floating
@@ -65,7 +66,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         attrs?.let {
             var typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
             typedArray?.apply {
-                defaultHeightRatio = getFloat(R.styleable.happyVideo_defaultHeightRatio, DEFAULT_HEIGHT_RATIO)
+               defaultHeightRatio = getFloat(R.styleable.happyVideo_defaultHeightRatio, 0f)
                 val isFromLastPosition = getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
                 val loop = getBoolean(R.styleable.happyVideo_loop, false)
                 val cache = getBoolean(R.styleable.happyVideo_isUseCache, false)
@@ -160,20 +161,31 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         }
     }
 
-    override fun startPlay(uir: Uri, headers: Map<String, String>?, cover: Uri, preLoading: Boolean) {
-        startPlay(uir, headers, preLoading)
-        setCover(cover)
-    }
-
-    override fun startPlay(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
+    override fun setUp(uir: Uri, headers: Map<String, String>?, cover: Uri, preLoading: Boolean) {
         mController?.reset()
-        mPlayerEngine.startPlay(uir, headers, preLoading)
+        setCover(cover)
+        mPlayerEngine.setUp(uir, headers, preLoading)
+    }
+
+    override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
+        mController?.reset()
+        setCover(uir)
+        mPlayerEngine.setUp(uir, headers, preLoading)
+
+    }
+
+    override fun startPlay() {
+       mPlayerEngine.startPlay()
     }
 
 
-    override fun noticePreLoading() {
-        mPlayerEngine.noticePreLoading()
-    }
+
+
+//    override fun startPlay(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
+//        mController?.reset()
+//        mPlayerEngine.startPlay(uir, headers, preLoading)
+//    }
+
 
     override fun setPlayerConfig(playerConfig: PlayerConfig) {
         mPlayerEngine.setPlayerConfig(playerConfig)
@@ -458,12 +470,23 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
 
 
-        // 高度为warpcontent 正常模式
-        if (layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT || isNormal()) {
-            val sizeH = widthSize * defaultHeightRatio
-            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
-        } else {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        if (heightMode == View.MeasureSpec.AT_MOST || isNormal()) {
+            if (defaultHeightRatio != 0f) {
+                val sizeH = widthSize * defaultHeightRatio
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
+                return
+            }
+
+            if (videoHeightRatio != 0f) {
+                val sizeH = widthSize * videoHeightRatio
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
+            } else {
+                val sizeH = widthSize * DEFAULT_HEIGHT_RATIO
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
+            }
         }
+
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 }
