@@ -10,7 +10,14 @@ interface IVideoPlayer : IPlayer {
 
     fun startPlay(uir: Uri, headers :Map<String, String> ?=null,cover:Uri, preLoading:Boolean = false)
 
+    /**
+     * 设置背景
+     */
     fun setCover(uir: Uri?)
+
+    /**
+     * 添加控制器
+     */
     fun addController(controller: IController)
     /**
      * 窗口模式

@@ -6,7 +6,9 @@ import android.net.Uri
 interface IPlayer {
 
 
-
+    /**
+     * 获得
+     */
 
     fun getCurrentUrl():Uri?
 
@@ -24,11 +26,19 @@ interface IPlayer {
 
 
     fun setListener(lister: PlayerStatusListener,add: Boolean)
+    /**
+     * 暂停
+     */
     fun pause()
 
+    /**
+     * 恢复
+     */
     fun resume()
 
-
+    /**
+     * 播放配置
+     */
     fun setPlayerConfig(playerConfig:PlayerConfig)
     fun getPlayerConfig():PlayerConfig
 

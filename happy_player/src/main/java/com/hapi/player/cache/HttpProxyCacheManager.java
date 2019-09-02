@@ -23,9 +23,9 @@ public class HttpProxyCacheManager {
     }
 
 
-    public HttpProxyCacheServer getProxy(Context app){
+    public HttpProxyCacheServer getProxy(Context context){
           if(proxy == null){
-              proxy = newProxy(app);
+              proxy = newProxy(context);
           }
           return proxy;
     }

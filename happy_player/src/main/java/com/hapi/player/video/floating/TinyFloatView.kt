@@ -10,7 +10,7 @@ import com.hapi.player.PlayerStatus.MODE_TINY_WINDOW
 import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
 
-class TinyFloatView : FrameLayout {
+internal class TinyFloatView : FrameLayout {
 
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)

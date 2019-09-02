@@ -208,6 +208,8 @@ internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
         LogUtil.d("onPrepared ——> STATE_PREPARED")
 
         if (isPreLoading) {
+            mCurrentState = STATE_PRELOADED_WAITING
+            mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             LogUtil.d("onPrepared ——> STATE_PREPARED   wait noticePreLoading")
         } else {
             startCall.invoke()

@@ -11,7 +11,7 @@ import com.hapi.player.PlayerStatus.MODE_NORMAL
 /**
  *
  */
-class HappyTextureView : TextureView {
+internal class HappyTextureView : TextureView {
 
     private var videoHeight: Int = 0
     private var videoWidth: Int = 0
