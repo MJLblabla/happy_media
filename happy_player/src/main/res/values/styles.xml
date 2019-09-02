@@ -9,11 +9,17 @@
     </style>
 
 
-
-
     <declare-styleable name="happyVideo">
-        <attr name="defaultHeightRatio" format="float" />
-    </declare-styleable>
+        <attr name="defaultHeightRatio" format="float"/>
+        <attr name="loop" format="boolean"/>
+        <attr name="isFromLastPosition" format="boolean"/>
+        <attr name="isUseCache" format="boolean"/>
+        <attr name="centerCropError"  format="float"/>
 
+        <!--<attr name="cropType">-->
+            <!--<enum name="fitXy" value="1"/>-->
+            <!--<enum name="centerCrop" value="2"/>-->
+        <!--</attr>-->
+    </declare-styleable>
 
 </resources>

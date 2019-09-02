@@ -1,10 +1,11 @@
-package com.hapi.player
+package com.hapi.player.enegine
 
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.view.Surface
+import com.hapi.player.AbsPlayerEngine
 import com.hapi.player.PlayerStatus.*
 import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
@@ -12,9 +13,10 @@ import com.hapi.player.utils.PalyerUtil
 /**
  * 原生播放引擎
  */
-class NativeEngine(private val context: Context) : AbsPlayerEngine() {
+internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
 
-    private var mUrl:Uri?=null
+
+    private var mUrl: Uri? = null
 
     private var mCurrentState = STATE_IDLE
 
@@ -22,7 +24,7 @@ class NativeEngine(private val context: Context) : AbsPlayerEngine() {
     private var mBufferPercentage: Int = 0
     private var mHeaders: Map<String, String>? = null
 
-
+    private var isPreLoading = false
     /**
      * 原生 播放器
      */
@@ -71,16 +73,17 @@ class NativeEngine(private val context: Context) : AbsPlayerEngine() {
     }
 
 
+    override fun readPlayerConfig() {
+        continueFromLastPosition = mPlayerConfig.isFromLastPosition
+        mMediaPlayer.isLooping = mPlayerConfig.loop
+    }
 
-
-    override fun playAfterDealUrl(uir: Uri, headers: Map<String, String>?, loop: Boolean, fromLastPosition: Boolean) {
+    override fun playAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
+        isPreLoading = preLoading
         mUrl = uir
-        continueFromLastPosition = fromLastPosition
-        mMediaPlayer.isLooping = loop
         mHeaders = headers
         openMedia()
     }
-
 
     private fun openMedia() {
         mCurrentState = STATE_PREPARING
@@ -102,7 +105,7 @@ class NativeEngine(private val context: Context) : AbsPlayerEngine() {
     }
 
 
-    private fun savePotion(){
+    private fun savePotion() {
         if (isPlaying() || isBufferingPlaying() || isBufferingPaused() || isPaused()) {
             PalyerUtil.savePlayPosition(context, mUrl?.path, getCurrentPosition().toInt())
         } else if (isCompleted()) {
@@ -179,7 +182,7 @@ class NativeEngine(private val context: Context) : AbsPlayerEngine() {
     }
 
     override fun releasePlayer() {
-
+        super.releasePlayer()
         mCurrentState = STATE_IDLE
         mAudioManager.abandonAudioFocus(audioFocusChangeListener)
         mMediaPlayer.release()
@@ -189,21 +192,36 @@ class NativeEngine(private val context: Context) : AbsPlayerEngine() {
         Runtime.getRuntime().gc()
     }
 
-
+    private val startCall = {
+        mMediaPlayer.start()
+        // 从上次的保存位置播放
+        if (continueFromLastPosition) {
+            val savedPlayPosition = PalyerUtil.getSavedPlayPosition(context, mUrl?.path)
+            if (savedPlayPosition > 0) {
+                mMediaPlayer.seekTo(savedPlayPosition.toInt())
+            }
+        }
+    }
     private val mOnPreparedListener = MediaPlayer.OnPreparedListener { mp ->
         mCurrentState = STATE_PREPARED
         mPlayerStatusListener.onPlayStateChanged(mCurrentState)
         LogUtil.d("onPrepared ——> STATE_PREPARED")
-        mp.start()
-        // 从上次的保存位置播放
-        if (continueFromLastPosition) {
-            val savedPlayPosition = PalyerUtil.getSavedPlayPosition(context, mUrl?.path)
-             if(savedPlayPosition>0){
-                 mp.seekTo(savedPlayPosition.toInt())
-             }
+
+        if (isPreLoading) {
+            LogUtil.d("onPrepared ——> STATE_PREPARED   wait noticePreLoading")
+        } else {
+            startCall.invoke()
         }
 
     }
+
+    override fun noticePreLoading() {
+        if (isPreLoading && mCurrentState == STATE_PREPARED) {
+            startCall.invoke()
+        }
+        isPreLoading = false
+    }
+
 
     private val mOnCompletionListener = MediaPlayer.OnCompletionListener {
         mCurrentState = STATE_COMPLETED

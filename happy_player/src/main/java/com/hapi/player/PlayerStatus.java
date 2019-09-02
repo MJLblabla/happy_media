@@ -2,10 +2,9 @@ package com.hapi.player;
 
 public class PlayerStatus {
 
-    /**
-     * 播放错误
-     **/
-    public static final int STATE_ERROR = -1;
+
+
+
     /**
      * 播放未开始
      **/
@@ -38,6 +37,12 @@ public class PlayerStatus {
      * 播放完成
      **/
     public static final int STATE_COMPLETED = 7;
+
+
+    /**
+     * 播放错误
+     **/
+    public static final int STATE_ERROR = 8;
 
     /**
      * 普通模式

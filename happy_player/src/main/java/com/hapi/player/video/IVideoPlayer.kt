@@ -1,5 +1,6 @@
 package com.hapi.player.video
 
+import android.net.Uri
 import com.hapi.player.IPlayer
 import com.hapi.player.video.contronller.IController
 
@@ -7,7 +8,9 @@ interface IVideoPlayer : IPlayer {
 
 
 
+    fun startPlay(uir: Uri, headers :Map<String, String> ?=null,cover:Uri, preLoading:Boolean = false)
 
+    fun setCover(uir: Uri?)
     fun addController(controller: IController)
     /**
      * 窗口模式

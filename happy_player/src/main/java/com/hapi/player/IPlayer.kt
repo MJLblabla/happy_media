@@ -7,15 +7,30 @@ interface IPlayer {
 
 
 
+
     fun getCurrentUrl():Uri?
 
-    fun startPlay(uir: Uri, headers :Map<String, String> ?=null, loop: Boolean = false,fromLastPosition :Boolean = false)
-    fun startPlayWithCache(uir: Uri,context: Context, headers :Map<String, String> ?=null, loop: Boolean = false,fromLastPosition :Boolean = false)
+    /**
+     * 开始播放
+     *
+     * @param preLoading  预加载　　提前异步装载视频　　如果true 装载完成将等待　　noticePreLoading播放
+     */
+    fun startPlay(uir: Uri, headers :Map<String, String> ?=null,preLoading:Boolean = false)
+
+    /**
+     * 取消preLoading　的等待　如果　preLoading　　如果装载完成将直接播放　否则还是等装载完成才播放
+     */
+    fun  noticePreLoading()
+
 
     fun setListener(lister: PlayerStatusListener,add: Boolean)
     fun pause()
 
     fun resume()
+
+
+    fun setPlayerConfig(playerConfig:PlayerConfig)
+    fun getPlayerConfig():PlayerConfig
 
 
     fun seekTo(pos: Int)
