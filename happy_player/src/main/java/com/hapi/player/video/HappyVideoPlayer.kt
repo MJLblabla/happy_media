@@ -66,7 +66,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         attrs?.let {
             var typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
             typedArray?.apply {
-               defaultHeightRatio = getFloat(R.styleable.happyVideo_defaultHeightRatio, 0f)
+               defaultHeightRatio = getFloat(R.styleable.happyVideo_heightRatio, 0f)
                 val isFromLastPosition = getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
                 val loop = getBoolean(R.styleable.happyVideo_loop, false)
                 val cache = getBoolean(R.styleable.happyVideo_isUseCache, false)

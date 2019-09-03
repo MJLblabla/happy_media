@@ -17,10 +17,9 @@ class MainActivity : AppCompatActivity() {
         mHappyVideoPlayer.addController(DefaultController(this))
 
         b2.setOnClickListener {
-            mHappyVideoPlayer.startPlay(Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"))
+
         }
         btnStart.setOnClickListener {
-            mHappyVideoPlayer.startPlay(Uri.parse("https://media.w3.org/2010/05/sintel/trailer.mp4"))
         }
 
         btnPause.setOnClickListener {
