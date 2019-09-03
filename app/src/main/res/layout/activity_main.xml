@@ -28,6 +28,7 @@
             app:heightRatio="0.5625"
             app:isFromLastPosition="false"
             app:isUseCache="true"
+            app:isFirstFrameAsCover="true"
             app:centerCropError="0.1"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/textView"/>

@@ -19,11 +19,13 @@ import com.hapi.player.utils.PalyerUtil
 import com.hapi.player.video.contronller.IController
 import com.hapi.player.video.floating.Floating
 import com.hapi.player.video.floating.TinyFloatView
-import com.bumptech.glide.request.RequestOptions
+import com.hapi.player.utils.MediaMetadataRetrieverUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
-
 
 
     /**
@@ -50,7 +52,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     private lateinit var mPlayerEngine: AbsPlayerEngine
     private lateinit var coverImg: ImageView
     private var mSurfaceTexture: SurfaceTexture? = null
-
+    private var isFirstFrameAsCover = false
     private var mController: IController? = null
 
     /**
@@ -64,14 +66,14 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
 
         attrs?.let {
-            var typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
+            val typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
             typedArray?.apply {
-               defaultHeightRatio = getFloat(R.styleable.happyVideo_heightRatio, 0f)
+                defaultHeightRatio = getFloat(R.styleable.happyVideo_heightRatio, 0f)
                 val isFromLastPosition = getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
                 val loop = getBoolean(R.styleable.happyVideo_loop, false)
                 val cache = getBoolean(R.styleable.happyVideo_isUseCache, false)
 
-
+                isFirstFrameAsCover = getBoolean(R.styleable.happyVideo_isFirstFrameAsCover,false)
                 centerCropError = getFloat(R.styleable.happyVideo_centerCropError, 0f)
                 val config = mPlayerEngine.getPlayerConfig()
                 config.setFromLastPosition(isFromLastPosition)
@@ -85,6 +87,8 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                     )
                 mPlayerEngine.setPlayerConfig(config)
             }
+
+            typedArray?.recycle()
         }
 
         init()
@@ -162,29 +166,43 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
     override fun setUp(uir: Uri, headers: Map<String, String>?, cover: Uri, preLoading: Boolean) {
-        mController?.reset()
         setCover(cover)
+        onSetUp(uir, headers, preLoading)
+    }
+
+    private fun onSetUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean){
+        videoHeightRatio = 0f
+        mController?.reset()
         mPlayerEngine.setUp(uir, headers, preLoading)
+
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val params = MediaMetadataRetrieverUtil().queryVideoParams(uir.toString())
+            params?.let {
+                val w = it.width
+                val h = it.height
+                if (w > 0 && h > 0) {
+                    videoHeightRatio = h.toFloat() / w
+                    requestLayout()
+                }
+            }
+        }
     }
 
     override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
-        mController?.reset()
-        setCover(uir)
-        mPlayerEngine.setUp(uir, headers, preLoading)
+        if(isFirstFrameAsCover){
+            setCover(uir)
+        }
+
+        onSetUp(uir, headers, preLoading)
 
     }
 
     override fun startPlay() {
-       mPlayerEngine.startPlay()
+        mPlayerEngine.startPlay()
     }
 
 
-
-
-//    override fun startPlay(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
-//        mController?.reset()
-//        mPlayerEngine.startPlay(uir, headers, preLoading)
-//    }
 
 
     override fun setPlayerConfig(playerConfig: PlayerConfig) {
@@ -271,9 +289,14 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         if (mCurrentMode == MODE_TINY_WINDOW) {
             return
         }
-
+        val ratio = if (videoHeightRatio == 0f) {
+            height / width.toFloat()
+        } else {
+            videoHeightRatio
+        }
         if (flag) {
-            mFloating.start(videoHeightRatio, mContainer, object : Floating.OnFloatingDelegate {
+
+            mFloating.start(ratio, mContainer, object : Floating.OnFloatingDelegate {
                 override fun onAninmationEnd() {
                     mCurrentMode = MODE_TINY_WINDOW
                     mPlayerEngine.mPlayerStatusListener.onPlayModeChanged(mCurrentMode)
@@ -293,7 +316,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
             val w = (PalyerUtil.getScreenWidth(context) * 0.6f).toInt()
             val params = FrameLayout.LayoutParams(
                 w,
-                (w * videoHeightRatio).toInt()
+                (w * ratio).toInt()
             )
             params.gravity = Gravity.BOTTOM or Gravity.END
             params.rightMargin = PalyerUtil.dp2px(context, 8f)

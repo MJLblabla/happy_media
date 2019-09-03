@@ -14,6 +14,7 @@
         <attr name="loop" format="boolean"/>
         <attr name="isFromLastPosition" format="boolean"/>
         <attr name="isUseCache" format="boolean"/>
+        <attr name="isFirstFrameAsCover"  format="boolean"/>
         <attr name="centerCropError"  format="float"/>
 
         <!--<attr name="cropType">-->
