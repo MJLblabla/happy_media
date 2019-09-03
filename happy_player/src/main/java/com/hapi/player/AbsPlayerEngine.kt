@@ -34,6 +34,7 @@ abstract class AbsPlayerEngine : IPlayer {
 
     final override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
         val str = uir.toString()
+//        val proxyUrl = uir
         val proxyUrl = if (str.startsWith("http") && mPlayerConfig.cacheContext != null && mPlayerConfig.isUseCache) {
             val proxy = HttpProxyCacheManager.getHttpProxyCacheManager()
                 .getProxy(mPlayerConfig.cacheContext!!.applicationContext)

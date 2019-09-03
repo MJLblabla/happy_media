@@ -1,5 +1,7 @@
 package com.hapi.player.utils
 
+import android.net.Uri
+
 /**
  * @author athoucai
  * @date 2019/2/18

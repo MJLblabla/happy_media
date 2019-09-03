@@ -483,7 +483,6 @@ public class DefaultController extends FrameLayout implements IController, View.
         }
         if (v == mCenterStart) {
             if (mPlayer.isIdle()) {
-                mPlayer.setUp(Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"),null,false);
                 mPlayer.startPlay();
             }
         } else if (v == mBack) {

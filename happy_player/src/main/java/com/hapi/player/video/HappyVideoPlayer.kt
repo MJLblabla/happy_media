@@ -146,6 +146,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                     }
                 }
             }
+            mOrientationDetector?.isEnable = false
         }
     }
 
@@ -181,8 +182,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
     }
 
-
-
     override fun lockScreen(toLock:Boolean): Boolean {
         if(isTinyWindow()){
             return false
@@ -194,8 +193,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     override fun isLock(): Boolean {
         return mOrientationDetector?.mIsLock?:false
     }
-
-
 
 
     override fun setCover(uir: Uri?) {
@@ -219,7 +216,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
 
         GlobalScope.launch(Dispatchers.Main) {
-            val params = MediaMetadataRetrieverUtil().queryVideoParams(uir.toString())
+            val params = MediaMetadataRetrieverUtil().queryVideoParams(uir.toString(),headers?:HashMap<String,String>())
             params?.let {
                 val w = it.width
                 val h = it.height
@@ -241,7 +238,9 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
     override fun startPlay() {
+        mOrientationDetector?.isEnable = true
         mPlayerEngine.startPlay()
+
     }
 
 

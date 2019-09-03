@@ -1,8 +1,12 @@
 package com.hapi.player.utils
 
+import android.content.Context
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.support.annotation.WorkerThread
 import android.text.TextUtils
+import android.util.Log
+import wseemann.media.FFmpegMediaMetadataRetriever
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -16,26 +20,20 @@ class MediaMetadataRetrieverUtil {
 
 
 
-    suspend fun queryVideoParams(videoPath: String?) = suspendCoroutine<MediaParams?> { continuation ->
-        continuation.resume(getVideoParams(videoPath))
-    }
+    suspend fun queryVideoParams(videoPath:String,header:Map<String,String>) = suspendCoroutine<MediaParams?> { continuation ->
 
 
-    private fun getVideoParams(videoPath: String?): MediaParams? {
-        if (TextUtils.isEmpty(videoPath)) {
-            return null
-        }
-        val media = MediaMetadataRetriever()
+
+        var mediaParams:MediaParams?=null
+        val media = FFmpegMediaMetadataRetriever()
         try {
+            Log.d("getVideoParams","thread"+Thread.currentThread().id)
             val path = videoPath
-            media.setDataSource(path)
-
-            val video_length = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
-            val mimeType = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
-            val width = media.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
-            val height = media.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
-
-            return MediaParams(path, width, height,video_length, mimeType)
+            media.setDataSource(path,header)
+            val video_length = media.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
+            val width = media.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
+            val height = media.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
+            mediaParams=  MediaParams(path, width, height,video_length)
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -43,7 +41,11 @@ class MediaMetadataRetrieverUtil {
                 it.release()
             }
         }
-        return null
+
+        continuation.resume(mediaParams)
     }
+
+
+
 
 }

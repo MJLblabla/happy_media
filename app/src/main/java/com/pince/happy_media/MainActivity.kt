@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity() {
 
         mHappyVideoPlayer.addController(DefaultController(this))
 
+        mHappyVideoPlayer.setUp(Uri.parse("https://media.w3.org/2010/05/sintel/trailer.mp4"), null, false)
+
         b2.setOnClickListener {
 
         }
