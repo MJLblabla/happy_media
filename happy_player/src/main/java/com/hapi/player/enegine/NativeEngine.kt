@@ -13,7 +13,7 @@ import com.hapi.player.utils.PalyerUtil
 /**
  * 原生播放引擎
  */
-internal class NativeEngine(private val context: Context) : AbsPlayerEngine() {
+internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
 
     private var mUrl: Uri? = null
 

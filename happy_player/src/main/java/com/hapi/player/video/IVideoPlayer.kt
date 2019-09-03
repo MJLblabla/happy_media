@@ -7,7 +7,10 @@ import com.hapi.player.video.contronller.IController
 interface IVideoPlayer : IPlayer {
 
 
-
+    /**
+     * @param cover 封面
+     * @param preLoading   预加载　　提前异步装载视频　　如果true 装载完成将等待　　startPlay
+     */
     fun setUp(uir: Uri, headers :Map<String, String> ?=null,cover:Uri, preLoading:Boolean = false)
 
 

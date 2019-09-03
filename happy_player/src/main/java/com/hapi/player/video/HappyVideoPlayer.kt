@@ -48,7 +48,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     private lateinit var mFloating: Floating
     private lateinit var mTextureView: HappyTextureView
     private lateinit var mSurface: Surface
-    private  var mPlayerEngine: AbsPlayerEngine
+    private var mPlayerEngine: AbsPlayerEngine
     private lateinit var coverImg: ImageView
     private var mSurfaceTexture: SurfaceTexture? = null
     private var isFirstFrameAsCover = false
@@ -64,7 +64,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
      */
     private var autoChangeOrientation = false
 
-    private var mOrientationDetector:OrientationDetector?=null
+    private var mOrientationDetector: OrientationDetector? = null
 
 
     constructor(context: Context?) : this(context, null)
@@ -79,19 +79,13 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                 val isFromLastPosition = getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
                 val loop = getBoolean(R.styleable.happyVideo_loop, false)
                 val cache = getBoolean(R.styleable.happyVideo_isUseCache, false)
-                autoChangeOrientation =getBoolean(R.styleable.happyVideo_autoChangeOrientation,false)
-                isFirstFrameAsCover = getBoolean(R.styleable.happyVideo_isFirstFrameAsCover,false)
+                autoChangeOrientation = getBoolean(R.styleable.happyVideo_autoChangeOrientation, false)
+                isFirstFrameAsCover = getBoolean(R.styleable.happyVideo_isFirstFrameAsCover, false)
                 centerCropError = getFloat(R.styleable.happyVideo_centerCropError, 0f)
                 val config = mPlayerEngine.getPlayerConfig()
                 config.setFromLastPosition(isFromLastPosition)
                     .setLoop(loop)
-                    .setUseCache(
-                        if (cache) {
-                            context
-                        } else {
-                            null
-                        }
-                    )
+                    .setUseCache(cache)
                 mPlayerEngine.setPlayerConfig(config)
             }
 
@@ -102,7 +96,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
     private var mCurrentMode = MODE_NORMAL
-
 
 
     private fun init() {
@@ -128,20 +121,20 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         VideoPlayerManager.instance().currentVideoPlayer = this
         coverImg = LayoutInflater.from(context).inflate(R.layout.layout_cover, mContainer, false) as ImageView
         mContainer.addView(coverImg)
-        mPlayerEngine.setListener(mediaPlayerListener, true)
+        mPlayerEngine.addPlayStatusListener(mediaPlayerListener, true)
 
 
-        if(autoChangeOrientation){
-            mOrientationDetector = OrientationDetector(PalyerUtil.scanForActivity(context)){
+        if (autoChangeOrientation) {
+            mOrientationDetector = OrientationDetector(PalyerUtil.scanForActivity(context)) {
 
-                if(it==0 || it==180){
-                    if(isFullScreen()){
+                if (it == 0 || it == 180) {
+                    if (isFullScreen()) {
                         beExitFullScreen(false)
                     }
                 }
 
-                if(it==90||it==270){
-                    if(isNormal()){
+                if (it == 90 || it == 270) {
+                    if (isNormal()) {
                         beEnterFullScreen(false)
                     }
                 }
@@ -178,20 +171,20 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mController = controller
         controller.attach(this)
         mContainer.addView(controller.getView())
-        setListener(controller, true)
+        addPlayStatusListener(controller, true)
 
     }
 
-    override fun lockScreen(toLock:Boolean): Boolean {
-        if(isTinyWindow()){
+    override fun lockScreen(toLock: Boolean): Boolean {
+        if (isTinyWindow()) {
             return false
         }
 
-       return mOrientationDetector?.lockScreen(toLock)?:false
+        return mOrientationDetector?.lockScreen(toLock) ?: false
     }
 
     override fun isLock(): Boolean {
-        return mOrientationDetector?.mIsLock?:false
+        return mOrientationDetector?.mIsLock ?: false
     }
 
 
@@ -209,14 +202,15 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         onSetUp(uir, headers, preLoading)
     }
 
-    private fun onSetUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean){
+    private fun onSetUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
         videoHeightRatio = 0f
         mController?.reset()
         mPlayerEngine.setUp(uir, headers, preLoading)
 
 
         GlobalScope.launch(Dispatchers.Main) {
-            val params = MediaMetadataRetrieverUtil().queryVideoParams(uir.toString(),headers?:HashMap<String,String>())
+            val params =
+                MediaMetadataRetrieverUtil().queryVideoParams(uir.toString(), headers ?: HashMap<String, String>())
             params?.let {
                 val w = it.width
                 val h = it.height
@@ -229,7 +223,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
     override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
-        if(isFirstFrameAsCover){
+        if (isFirstFrameAsCover) {
             setCover(uir)
         }
 
@@ -244,8 +238,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
 
-
-
     override fun setPlayerConfig(playerConfig: PlayerConfig) {
         mPlayerEngine.setPlayerConfig(playerConfig)
     }
@@ -255,8 +247,8 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
 
-    override fun setListener(lister: PlayerStatusListener, add: Boolean) {
-        mPlayerEngine.setListener(lister, add)
+    override fun addPlayStatusListener(lister: PlayerStatusListener, add: Boolean) {
+        mPlayerEngine.addPlayStatusListener(lister, add)
     }
 
 
@@ -270,20 +262,20 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
 
-    private fun beEnterFullScreen(changeOrientation: Boolean){
+    private fun beEnterFullScreen(changeOrientation: Boolean) {
 
 
         if (mCurrentMode == MODE_FULL_SCREEN) {
             return
         }
 
-        if(isTinyWindow()){
+        if (isTinyWindow()) {
             exitTinyWindow()
         }
 
         // 隐藏ActionBar、状态栏，并横屏
         PalyerUtil.hideActionBar(context)
-        if(changeOrientation){
+        if (changeOrientation) {
             PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
 
@@ -311,7 +303,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         return beExitFullScreen(true)
     }
 
-    private fun beExitFullScreen(changeOrientation: Boolean):Boolean{
+    private fun beExitFullScreen(changeOrientation: Boolean): Boolean {
         if (mCurrentMode == MODE_FULL_SCREEN) {
             PalyerUtil.showActionBar(context)
             PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
@@ -332,7 +324,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         }
         return false
     }
-
 
 
     override fun enterTinyWindow() {

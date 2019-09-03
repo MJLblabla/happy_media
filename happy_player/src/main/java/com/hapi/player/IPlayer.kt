@@ -4,10 +4,8 @@ import android.content.Context
 import android.net.Uri
 
 interface IPlayer {
-
-
     /**
-     * 获得
+     * 获得当前播放url
      */
 
     fun getCurrentUrl():Uri?
@@ -15,7 +13,7 @@ interface IPlayer {
     /**
      * 开始播放
      *
-     * @param preLoading  预加载　　提前异步装载视频　　如果true 装载完成将等待　　noticePreLoading播放
+     * @param preLoading  预加载　　提前异步装载视频　　如果true 装载完成将等待　　startPlay
      */
     fun setUp(uir: Uri, headers :Map<String, String> ?=null,preLoading:Boolean = false)
 
@@ -25,7 +23,7 @@ interface IPlayer {
     fun  startPlay()
 
 
-    fun setListener(lister: PlayerStatusListener,add: Boolean)
+    fun addPlayStatusListener(lister: PlayerStatusListener, isAdd: Boolean)
     /**
      * 暂停
      */

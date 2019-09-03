@@ -1,12 +1,13 @@
 package com.hapi.player
 
 
+import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import android.view.Surface
 import com.hapi.player.cache.HttpProxyCacheManager
 
-abstract class AbsPlayerEngine : IPlayer {
+abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
 
     private var listeners = ArrayList<PlayerStatusListener>()
     protected var mPlayerConfig = PlayerConfig()
@@ -35,9 +36,9 @@ abstract class AbsPlayerEngine : IPlayer {
     final override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
         val str = uir.toString()
 //        val proxyUrl = uir
-        val proxyUrl = if (str.startsWith("http") && mPlayerConfig.cacheContext != null && mPlayerConfig.isUseCache) {
+        val proxyUrl = if (str.startsWith("http")  && mPlayerConfig.isUseCache) {
             val proxy = HttpProxyCacheManager.getHttpProxyCacheManager()
-                .getProxy(mPlayerConfig.cacheContext!!.applicationContext)
+                .getProxy(context.applicationContext)
             val proxyUrl = proxy.getProxyUrl(str)
             Uri.parse(proxyUrl)
         } else {
@@ -69,7 +70,7 @@ abstract class AbsPlayerEngine : IPlayer {
     abstract fun playAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean)
 
 
-    override fun setListener(lister: PlayerStatusListener, add: Boolean) {
+    override fun addPlayStatusListener(lister: PlayerStatusListener, add: Boolean) {
         if (add) {
             listeners.add(lister)
         } else {

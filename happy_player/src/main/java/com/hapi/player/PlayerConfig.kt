@@ -1,6 +1,5 @@
 package com.hapi.player
 
-import android.content.Context
 
 class PlayerConfig {
 
@@ -20,27 +19,18 @@ class PlayerConfig {
      */
     internal var isUseCache = false
 
-    internal var cacheContext:Context?=null
 
-
-
-
-    fun setLoop(loop:Boolean):PlayerConfig{
+    fun setLoop(loop: Boolean): PlayerConfig {
         return this
     }
 
-    fun setFromLastPosition(fromLastPosition: Boolean):PlayerConfig{
+    fun setFromLastPosition(fromLastPosition: Boolean): PlayerConfig {
         this.isFromLastPosition = fromLastPosition
         return this
     }
 
-    fun setUseCache(cacheContext:Context?):PlayerConfig{
-        if(cacheContext==null){
-            isUseCache = false
-        }else{
-            isUseCache = true
-            this.cacheContext = cacheContext
-        }
+    fun setUseCache(isUseCache: Boolean): PlayerConfig {
+        this.isUseCache = isUseCache
         return this
     }
 }

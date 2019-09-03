@@ -17,7 +17,6 @@ public class PlayerStatus {
      * 播放准备就绪
      **/
     public static final int STATE_PREPARED = 2;
-
     /**
      * 预装载完成　等等通知播放
      */
@@ -42,13 +41,10 @@ public class PlayerStatus {
      * 播放完成
      **/
     public static final int STATE_COMPLETED = 8;
-
-
     /**
      * 播放错误
      **/
     public static final int STATE_ERROR = 9;
-
     /**
      * 普通模式
      **/
