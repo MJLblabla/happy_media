@@ -27,7 +27,6 @@ import kotlinx.coroutines.launch
 
 open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
 
-
     /**
      * wrap content 高度下的 宽高比
      */
@@ -60,11 +59,19 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     　　*
      */
     private var centerCropError = 0f
+    /**
+     * 自动旋转
+     */
+    private var autoChangeOrientation = false
+
+    private var mOrientationDetector:OrientationDetector?=null
+
 
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
 
+        mPlayerEngine = NativeEngine(context!!)
         attrs?.let {
             val typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
             typedArray?.apply {
@@ -72,7 +79,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                 val isFromLastPosition = getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
                 val loop = getBoolean(R.styleable.happyVideo_loop, false)
                 val cache = getBoolean(R.styleable.happyVideo_isUseCache, false)
-
+                autoChangeOrientation =getBoolean(R.styleable.happyVideo_autoChangeOrientation,false)
                 isFirstFrameAsCover = getBoolean(R.styleable.happyVideo_isFirstFrameAsCover,false)
                 centerCropError = getFloat(R.styleable.happyVideo_centerCropError, 0f)
                 val config = mPlayerEngine.getPlayerConfig()
@@ -97,6 +104,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     private var mCurrentMode = MODE_NORMAL
 
 
+
     private fun init() {
         mContainer = TinyFloatView(context)
 
@@ -115,12 +123,30 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mTextureView.parentWindType = { mCurrentMode }
         mContainer.removeView(mTextureView)
         mContainer.addView(mTextureView, 0)
-        mPlayerEngine = NativeEngine(context)
+
         mPlayerEngine.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener)
         VideoPlayerManager.instance().currentVideoPlayer = this
         coverImg = LayoutInflater.from(context).inflate(R.layout.layout_cover, mContainer, false) as ImageView
         mContainer.addView(coverImg)
         mPlayerEngine.setListener(mediaPlayerListener, true)
+
+
+        if(autoChangeOrientation){
+            mOrientationDetector = OrientationDetector(PalyerUtil.scanForActivity(context)){
+
+                if(it==0 || it==180){
+                    if(isFullScreen()){
+                        beExitFullScreen(false)
+                    }
+                }
+
+                if(it==90||it==270){
+                    if(isNormal()){
+                        beEnterFullScreen(false)
+                    }
+                }
+            }
+        }
     }
 
     private var mediaPlayerListener = object : PlayerStatusListener {
@@ -154,6 +180,22 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         setListener(controller, true)
 
     }
+
+
+
+    override fun lockScreen(toLock:Boolean): Boolean {
+        if(isTinyWindow()){
+            return false
+        }
+
+       return mOrientationDetector?.lockScreen(toLock)?:false
+    }
+
+    override fun isLock(): Boolean {
+        return mOrientationDetector?.mIsLock?:false
+    }
+
+
 
 
     override fun setCover(uir: Uri?) {
@@ -225,14 +267,27 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
     override fun enterFullScreen() {
 
+        beEnterFullScreen(true)
+    }
+
+
+    private fun beEnterFullScreen(changeOrientation: Boolean){
+
 
         if (mCurrentMode == MODE_FULL_SCREEN) {
             return
         }
 
+        if(isTinyWindow()){
+            exitTinyWindow()
+        }
+
         // 隐藏ActionBar、状态栏，并横屏
         PalyerUtil.hideActionBar(context)
-        PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        if(changeOrientation){
+            PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        }
+
 
         val contentView = PalyerUtil.scanForActivity(context)
             .findViewById(android.R.id.content) as ViewGroup
@@ -249,13 +304,18 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mCurrentMode = MODE_FULL_SCREEN
         mPlayerEngine.mPlayerStatusListener.onPlayModeChanged(mCurrentMode)
         LogUtil.d("MODE_FULL_SCREEN")
+
     }
 
     override fun exitFullScreen(): Boolean {
 
+        return beExitFullScreen(true)
+    }
+
+    private fun beExitFullScreen(changeOrientation: Boolean):Boolean{
         if (mCurrentMode == MODE_FULL_SCREEN) {
             PalyerUtil.showActionBar(context)
-            PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
             val contentView = PalyerUtil.scanForActivity(context)
                 .findViewById(android.R.id.content) as ViewGroup
@@ -272,23 +332,26 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
             return true
         }
         return false
-
     }
+
+
 
     override fun enterTinyWindow() {
 
-
-        if (mCurrentMode == MODE_TINY_WINDOW) {
+        if (mCurrentMode != MODE_NORMAL) {
             return
         }
         enterTinyWindowSmooth(true)
-
     }
 
+
     private fun enterTinyWindowSmooth(flag: Boolean) {
+
+
         if (mCurrentMode == MODE_TINY_WINDOW) {
             return
         }
+        mOrientationDetector?.isEnable = false
         val ratio = if (videoHeightRatio == 0f) {
             height / width.toFloat()
         } else {
@@ -333,6 +396,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
     override fun exitTinyWindow(): Boolean {
         if (mCurrentMode == MODE_TINY_WINDOW) {
+            mOrientationDetector?.isEnable = true
             mFloating.clear()
             val contentView = PalyerUtil.scanForActivity(context)
                 .findViewById(android.R.id.content) as ViewGroup
@@ -411,6 +475,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
     override fun releasePlayer() {
+        mOrientationDetector?.disable()
         mPlayerEngine.releasePlayer()
         mSurfaceTexture?.release()
         VideoPlayerManager.instance().releaseVideoPlayer()

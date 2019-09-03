@@ -16,6 +16,7 @@
         <attr name="isUseCache" format="boolean"/>
         <attr name="isFirstFrameAsCover"  format="boolean"/>
         <attr name="centerCropError"  format="float"/>
+        <attr name="autoChangeOrientation" format="boolean"/>
 
         <!--<attr name="cropType">-->
             <!--<enum name="fitXy" value="1"/>-->

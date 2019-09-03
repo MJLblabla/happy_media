@@ -12,6 +12,14 @@ interface IVideoPlayer : IPlayer {
 
 
     /**
+     * 锁定屏幕
+     * @return　成功失败
+     */
+    fun lockScreen(toLock:Boolean):Boolean
+
+    fun isLock():Boolean
+
+    /**
      * 设置背景
      */
     fun setCover(uir: Uri?)
