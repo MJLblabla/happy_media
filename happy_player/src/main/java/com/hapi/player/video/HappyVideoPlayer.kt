@@ -48,7 +48,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     private lateinit var mFloating: Floating
     private lateinit var mTextureView: HappyTextureView
     private lateinit var mSurface: Surface
-    private lateinit var mPlayerEngine: AbsPlayerEngine
+    private  var mPlayerEngine: AbsPlayerEngine
     private lateinit var coverImg: ImageView
     private var mSurfaceTexture: SurfaceTexture? = null
     private var isFirstFrameAsCover = false
