@@ -1,9 +1,7 @@
 package com.hapi.player.video.contronller;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.CountDownTimer;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -16,7 +14,6 @@ import com.hapi.player.R;
 import com.hapi.player.utils.PalyerUtil;
 import com.hapi.player.video.IVideoPlayer;
 import org.jetbrains.annotations.NotNull;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -42,7 +39,7 @@ public class DefaultController extends FrameLayout implements IController, View.
     private int mGestureDownVolume;
     private long mNewPosition;
 
-    private ImageView mImage;
+
     private ImageView mCenterStart;
 
     private LinearLayout mTop;
@@ -91,18 +88,17 @@ public class DefaultController extends FrameLayout implements IController, View.
     private TextView tvTinyWindow;
 
 
-
     public DefaultController(@NonNull Context context) {
         super(context);
         mContext = context;
-     //   this.setOnTouchListener(this);
+        this.setOnTouchListener(this);
         init();
     }
 
     public DefaultController(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
-       // this.setOnTouchListener(this);
+        this.setOnTouchListener(this);
         init();
     }
 
@@ -114,13 +110,11 @@ public class DefaultController extends FrameLayout implements IController, View.
     }
 
 
-
-
     private void init() {
+
         LayoutInflater.from(mContext).inflate(R.layout.tx_video_palyer_controller, this, true);
 
         mCenterStart = (ImageView) findViewById(R.id.center_start);
-        mImage = (ImageView) findViewById(R.id.image);
 
         mTop = (LinearLayout) findViewById(R.id.top);
         mBack = (ImageView) findViewById(R.id.back);
@@ -194,16 +188,9 @@ public class DefaultController extends FrameLayout implements IController, View.
         mTitle.setText(title);
     }
 
-    public ImageView imageView() {
-        return mImage;
-    }
 
     public ImageView playButton() {
         return mCenterStart;
-    }
-
-    public void setImage(@DrawableRes int resId) {
-        mImage.setImageResource(resId);
     }
 
 
@@ -244,7 +231,7 @@ public class DefaultController extends FrameLayout implements IController, View.
                 break;
             case MotionEvent.ACTION_MOVE:
 
-                if(mPlayer.isTinyWindow()){
+                if (mPlayer.isTinyWindow()) {
                     return false;
                 }
 
@@ -319,10 +306,12 @@ public class DefaultController extends FrameLayout implements IController, View.
                     return true;
                 }
                 break;
-            default:break;
+            default:
+                break;
         }
         return false;
     }
+
 
     /**
      * 取消更新进度的计时器。
@@ -337,8 +326,6 @@ public class DefaultController extends FrameLayout implements IController, View.
             mUpdateProgressTimerTask = null;
         }
     }
-
-
 
 
     @NotNull
@@ -366,7 +353,7 @@ public class DefaultController extends FrameLayout implements IController, View.
         mSeek.setSecondaryProgress(0);
 
         mCenterStart.setVisibility(View.VISIBLE);
-        mImage.setVisibility(View.VISIBLE);
+
 
         mBottom.setVisibility(View.GONE);
         mFullScreen.setImageResource(R.drawable.ic_player_enlarge);
@@ -387,7 +374,7 @@ public class DefaultController extends FrameLayout implements IController, View.
             case STATE_IDLE:
                 break;
             case STATE_PREPARING:
-                mImage.setVisibility(View.GONE);
+
                 mLoading.setVisibility(View.VISIBLE);
                 mLoadText.setText(getContext().getString(R.string.video_buffering));
                 mError.setVisibility(View.GONE);
@@ -435,7 +422,8 @@ public class DefaultController extends FrameLayout implements IController, View.
                 //  mImage.setVisibility(View.VISIBLE);
                 mCompleted.setVisibility(View.VISIBLE);
                 break;
-            default:break;
+            default:
+                break;
         }
     }
 
@@ -449,6 +437,7 @@ public class DefaultController extends FrameLayout implements IController, View.
                 mClarity.setVisibility(View.GONE);
                 mBatteryTime.setVisibility(View.GONE);
                 tvTinyWindow.setVisibility(View.VISIBLE);
+                tvTinyWindow.setText("小窗");
                 break;
             case MODE_FULL_SCREEN:
                 mBack.setVisibility(View.VISIBLE);
@@ -465,8 +454,10 @@ public class DefaultController extends FrameLayout implements IController, View.
                 mClarity.setVisibility(View.GONE);
                 mFullScreen.setVisibility(View.GONE);
                 tvTinyWindow.setVisibility(View.VISIBLE);
+                tvTinyWindow.setText("退出小窗");
                 break;
-            default:break;
+            default:
+                break;
         }
     }
 
@@ -474,8 +465,8 @@ public class DefaultController extends FrameLayout implements IController, View.
     @Override
     public void onClick(View v) {
 
-        if(v == tvTinyWindow){
-            if (mPlayer.isNormal() ) {
+        if (v == tvTinyWindow) {
+            if (mPlayer.isNormal()) {
                 mPlayer.enterTinyWindow();
             } else if (mPlayer.isTinyWindow()) {
                 mPlayer.exitTinyWindow();
@@ -510,7 +501,7 @@ public class DefaultController extends FrameLayout implements IController, View.
             mPlayer.resume();
         } else if (v == mReplay) {
             mPlayer.resume();
-        }  else if (v == this) {
+        } else if (v == this) {
             if (mPlayer.isPlaying()
                     || mPlayer.isPaused()
                     || mPlayer.isBufferingPlaying()
@@ -519,9 +510,6 @@ public class DefaultController extends FrameLayout implements IController, View.
             }
         }
     }
-
-
-
 
 
     /**
@@ -589,7 +577,7 @@ public class DefaultController extends FrameLayout implements IController, View.
             mPlayer.resume();
         }
         long d = mPlayer.getDuration();
-        long sp =  seekBar.getProgress();
+        long sp = seekBar.getProgress();
         long position = (long) (mPlayer.getDuration() * seekBar.getProgress() / 100f);
         mPlayer.seekTo((int) position);
         startDismissTopBottomTimer();

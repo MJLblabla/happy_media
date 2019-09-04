@@ -25,11 +25,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnPause.setOnClickListener {
-            mHappyVideoPlayer.pause()
+            mHappyVideoPlayer.enterTinyWindow()
         }
 
         btnResume.setOnClickListener {
-            mHappyVideoPlayer.resume()
+            mHappyVideoPlayer.exitFullScreen()
         }
 
     }

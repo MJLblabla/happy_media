@@ -103,27 +103,26 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
         (mContainer as TinyFloatView).parentWindType = { mCurrentMode }
         mContainer.setBackgroundColor(Color.BLACK)
+
+
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         this.addView(mContainer, params)
+        val textureContainer =
+            LayoutInflater.from(context).inflate(R.layout.layout_texture_container, mContainer, false)
+        mContainer.addView(textureContainer)
         mFloating = Floating(PalyerUtil.scanForActivity(context))
-        mTextureView =
-            LayoutInflater.from(context).inflate(R.layout.happytextureview, this, false) as HappyTextureView
+        mTextureView = textureContainer.findViewById(R.id.mTextureView)
         mTextureView.surfaceTextureListener = this
         mTextureView.setCenterCropError(centerCropError)
         mTextureView.parentWindType = { mCurrentMode }
-        mContainer.removeView(mTextureView)
-        mContainer.addView(mTextureView, 0)
-
         mPlayerEngine.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener)
         VideoPlayerManager.instance().currentVideoPlayer = this
-        coverImg = LayoutInflater.from(context).inflate(R.layout.layout_cover, mContainer, false) as ImageView
-        mContainer.addView(coverImg)
+        coverImg = textureContainer.findViewById(R.id.coverImg)
+
         mPlayerEngine.addPlayStatusListener(mediaPlayerListener, true)
-
-
         if (autoChangeOrientation) {
             mOrientationDetector = OrientationDetector(PalyerUtil.scanForActivity(context)) {
 
@@ -208,19 +207,23 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mPlayerEngine.setUp(uir, headers, preLoading)
         GlobalScope.launch(Dispatchers.Main) {
             val params =
-                MediaMetadataRetrieverUtil().queryVideoParams(context,uir.toString(), headers ?: HashMap<String, String>())
+                MediaMetadataRetrieverUtil().queryVideoParams(
+                    context,
+                    uir.toString(),
+                    headers ?: HashMap<String, String>()
+                )
 
-            LogUtil.d("getVideoParams 得到结果"+Thread.currentThread().id)
+            LogUtil.d("getVideoParams 得到结果" + Thread.currentThread().id)
             params?.let {
                 val w = it.width
                 val h = it.height
-                if ( it.path == getCurrentUrl()?.toString()&& w > 0 && h > 0 ) {
+                if (it.path == getCurrentUrl()?.toString() && w > 0 && h > 0) {
                     videoHeightRatio = h.toFloat() / w
                     requestLayout()
                 }
             }
         }
-        LogUtil.d("onSetUp ok thread"+Thread.currentThread().id)
+        LogUtil.d("onSetUp ok thread" + Thread.currentThread().id)
 
     }
 

@@ -10,8 +10,9 @@ import com.hapi.player.video.IVideoPlayer
 interface IController : PlayerStatusListener {
 
 
+
     fun getView(): View
-    fun attach(player: IVideoPlayer)
+    fun attach(player: IVideoPlayer){}
     fun detach()
     /**
      * 重置控制器，将控制器恢复到初始状态。

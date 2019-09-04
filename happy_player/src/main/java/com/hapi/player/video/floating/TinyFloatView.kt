@@ -24,24 +24,18 @@ internal class TinyFloatView : FrameLayout {
 
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-        LogUtil.d("onInterceptTouchEvent " + event?.action)
 
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                startX = event.rawX
-                startY = event.rawY
-                return super.onInterceptTouchEvent(event)
-            }
-            MotionEvent.ACTION_MOVE -> {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            startX = event.rawX
+            startY = event.rawY
+            return super.onInterceptTouchEvent(event)
+        }
 
-                val dx = event.rawX - startX
-                val dy = event.rawY -startY
-                LogUtil.d("updateWindowPos " + dx+"    "+dy)
-                if (Math.abs(dx)>0 && Math.abs(dy)>0 &&parentWindType?.invoke() == MODE_TINY_WINDOW) {
-                    return true
-                }
+        if (event.action == MotionEvent.ACTION_MOVE && parentWindType?.invoke() == MODE_TINY_WINDOW) {
+            val x = event.rawX - startX
+            val y = event.rawY - startY
 
-            }
+            return Math.abs(x) > 20 || Math.abs(y) > 20
         }
 
         return super.onInterceptTouchEvent(event)
@@ -51,10 +45,14 @@ internal class TinyFloatView : FrameLayout {
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
+        if (parentWindType?.invoke() != MODE_TINY_WINDOW) {
+            return super.onTouchEvent(event)
+        }
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 startX = event.rawX
                 startY = event.rawY
+                return true
             }
             MotionEvent.ACTION_MOVE -> {
 
@@ -65,7 +63,7 @@ internal class TinyFloatView : FrameLayout {
                 startX = event.rawX
                 startY = event.rawY
 
-                if (getX() + x < 0 || getX()  + x + width > screenWidth) {
+                if (getX() + x < 0 || getX() + x + width > screenWidth) {
                     return true
                 }
                 if (getY() + y < 0 || getY() + y + height > scrrenHeight) {
@@ -84,18 +82,17 @@ internal class TinyFloatView : FrameLayout {
 
 
     private fun updateWindowPos(x: Float, y: Float) {
-        if(x==0f && y==0f){
+        if (x == 0f && y == 0f) {
             return
         }
         translationX += x
-        translationY +=y
+        translationY += y
     }
 
 
-
-    fun resetTranslation(){
-        translationX  = 0f
-        translationY  =0f
+    fun resetTranslation() {
+        translationX = 0f
+        translationY = 0f
     }
 
 
