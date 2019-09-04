@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 
 open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
 
+
     /**
      * wrap content 高度下的 宽高比
      */
@@ -34,7 +35,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         private const val DEFAULT_HEIGHT_RATIO = (36F / 64)
 
     }
-
     /*
      wrap content 高度下的 宽高比
      */
@@ -69,17 +69,23 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
 
         mPlayerEngine = NativeEngine(context!!)
         attrs?.let {
             val typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
             typedArray?.apply {
                 defaultHeightRatio = getFloat(R.styleable.happyVideo_heightRatio, 0f)
-                val isFromLastPosition = getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
+                val isFromLastPosition =
+                    getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
                 val loop = getBoolean(R.styleable.happyVideo_loop, false)
                 val cache = getBoolean(R.styleable.happyVideo_isUseCache, false)
-                autoChangeOrientation = getBoolean(R.styleable.happyVideo_autoChangeOrientation, false)
+                autoChangeOrientation =
+                    getBoolean(R.styleable.happyVideo_autoChangeOrientation, false)
                 isFirstFrameAsCover = getBoolean(R.styleable.happyVideo_isFirstFrameAsCover, false)
                 centerCropError = getFloat(R.styleable.happyVideo_centerCropError, 0f)
                 val config = mPlayerEngine.getPlayerConfig()
@@ -111,7 +117,8 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         )
         this.addView(mContainer, params)
         val textureContainer =
-            LayoutInflater.from(context).inflate(R.layout.layout_texture_container, mContainer, false)
+            LayoutInflater.from(context)
+                .inflate(R.layout.layout_texture_container, mContainer, false)
         mContainer.addView(textureContainer)
         mFloating = Floating(PalyerUtil.scanForActivity(context))
         mTextureView = textureContainer.findViewById(R.id.mTextureView)
@@ -281,7 +288,8 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         // 隐藏ActionBar、状态栏，并横屏
         PalyerUtil.hideActionBar(context)
         if (changeOrientation) {
-            PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            PalyerUtil.scanForActivity(context).requestedOrientation =
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
 
 
@@ -311,7 +319,8 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     private fun beExitFullScreen(changeOrientation: Boolean): Boolean {
         if (mCurrentMode == MODE_FULL_SCREEN) {
             PalyerUtil.showActionBar(context)
-            PalyerUtil.scanForActivity(context).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            PalyerUtil.scanForActivity(context).requestedOrientation =
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
             val contentView = PalyerUtil.scanForActivity(context)
                 .findViewById(android.R.id.content) as ViewGroup
@@ -330,9 +339,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         return false
     }
 
-
     override fun enterTinyWindow() {
-
         if (mCurrentMode != MODE_NORMAL) {
             return
         }
@@ -423,13 +430,14 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
 
-    private val mOnVideoSizeChangedListener = MediaPlayer.OnVideoSizeChangedListener { mp, width, height ->
-        if (width > 0 && height > 0) {
-            videoHeightRatio = height.toFloat() / width
-            mTextureView.adaptVideoSize(width, height)
+    private val mOnVideoSizeChangedListener =
+        MediaPlayer.OnVideoSizeChangedListener { mp, width, height ->
+            if (width > 0 && height > 0) {
+                videoHeightRatio = height.toFloat() / width
+                mTextureView.adaptVideoSize(width, height)
+            }
+            LogUtil.d("onVideoSizeChanged ——> width：$width， height：$height")
         }
-        LogUtil.d("onVideoSizeChanged ——> width：$width， height：$height")
-    }
 
 
     override fun pause() {
@@ -453,7 +461,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
     override fun getMaxVolume(): Int {
-
         return mPlayerEngine.getMaxVolume()
     }
 
@@ -533,6 +540,14 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         return mPlayerEngine.isError()
     }
 
+    override fun isPreLoading(): Boolean {
+        return mPlayerEngine.isPreLoading()
+    }
+
+    override fun isPreLoaded(): Boolean {
+        return mPlayerEngine.isPreLoaded()
+    }
+
     override fun isCompleted(): Boolean {
         return mPlayerEngine.isCompleted()
     }
@@ -556,17 +571,26 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         if (heightMode == View.MeasureSpec.AT_MOST && isNormal()) {
             if (defaultHeightRatio != 0f) {
                 val sizeH = widthSize * defaultHeightRatio
-                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST))
+                super.onMeasure(
+                    widthMeasureSpec,
+                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST)
+                )
                 return
             }
 
             if (videoHeightRatio != 0f) {
                 val sizeH = widthSize * videoHeightRatio
-                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST))
+                super.onMeasure(
+                    widthMeasureSpec,
+                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST)
+                )
                 return
             } else {
                 val sizeH = widthSize * DEFAULT_HEIGHT_RATIO
-                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST))
+                super.onMeasure(
+                    widthMeasureSpec,
+                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST)
+                )
                 return
             }
         }
