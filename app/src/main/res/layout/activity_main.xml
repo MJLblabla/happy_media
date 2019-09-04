@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:loop="true"
-            app:heightRatio="0.5625"
+
             app:isFromLastPosition="false"
             app:isUseCache="true"
             app:isFirstFrameAsCover="true"

@@ -2,12 +2,12 @@ package com.hapi.player.utils
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
-import android.net.Uri
-import android.support.annotation.WorkerThread
-import android.text.TextUtils
-import android.util.Log
-import wseemann.media.FFmpegMediaMetadataRetriever
-import java.io.File
+import com.hapi.player.been.MediaParams
+import com.hapi.player.been.room.MediaDataBase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -17,35 +17,53 @@ import kotlin.coroutines.suspendCoroutine
 class MediaMetadataRetrieverUtil {
 
 
+    suspend fun queryVideoParams(context: Context, videoPath: String, header: Map<String, String>) =
+        suspendCoroutine<MediaParams?> { continuation ->
 
 
+            val cache = MediaDataBase.getInstance(context).mediaDao.getMediaParams(videoPath)
+            if (cache == null) {
+                LogUtil.d("getVideoParams cache==null" + Thread.currentThread().id)
 
-    suspend fun queryVideoParams(videoPath:String,header:Map<String,String>) = suspendCoroutine<MediaParams?> { continuation ->
+                GlobalScope.launch(Dispatchers.Default) {
+                    // 将会获取默认调度器
+                    println("Default               : I'm working in thread ${Thread.currentThread().name}")
+                    var mediaParams: MediaParams? = null
+                    val media = MediaMetadataRetriever()
+                    try {
+                        LogUtil.d("getVideoParams thread" + Thread.currentThread().id)
+                        val path = videoPath
+                        media.setDataSource(path, header)
+                        val video_length = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
+                        val width = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
+                        val height = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
+                        mediaParams = MediaParams()
+                        mediaParams.height = height
+                        mediaParams.width = width
+                        mediaParams.path = videoPath
+                        mediaParams.video_length =video_length
 
+                        LogUtil.d("getVideoParams thread" + Thread.currentThread().id + "  " + width + "      " + height)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    } finally {
+                        media.let {
+                            it.release()
+                        }
+                    }
+                    mediaParams?.let {
+                        MediaDataBase.getInstance(context).mediaDao.insert(mediaParams)
+                    }
+                    continuation.resume(mediaParams)
+                }
 
-
-        var mediaParams:MediaParams?=null
-        val media = FFmpegMediaMetadataRetriever()
-        try {
-            Log.d("getVideoParams","thread"+Thread.currentThread().id)
-            val path = videoPath
-            media.setDataSource(path,header)
-            val video_length = media.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
-            val width = media.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
-            val height = media.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
-            mediaParams=  MediaParams(path, width, height,video_length)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            media?.let {
-                it.release()
+            } else {
+                LogUtil.d("getVideoParams cache!=null" + Thread.currentThread().id)
+                continuation.resume(cache)
             }
+
+
         }
-
-        continuation.resume(mediaParams)
-    }
-
-
 
 
 }

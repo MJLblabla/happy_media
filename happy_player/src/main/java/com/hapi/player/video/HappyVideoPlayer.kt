@@ -206,20 +206,22 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         videoHeightRatio = 0f
         mController?.reset()
         mPlayerEngine.setUp(uir, headers, preLoading)
-
-
         GlobalScope.launch(Dispatchers.Main) {
             val params =
-                MediaMetadataRetrieverUtil().queryVideoParams(uir.toString(), headers ?: HashMap<String, String>())
+                MediaMetadataRetrieverUtil().queryVideoParams(context,uir.toString(), headers ?: HashMap<String, String>())
+
+            LogUtil.d("getVideoParams 得到结果"+Thread.currentThread().id)
             params?.let {
                 val w = it.width
                 val h = it.height
-                if (w > 0 && h > 0) {
+                if ( it.path == getCurrentUrl()?.toString()&& w > 0 && h > 0 ) {
                     videoHeightRatio = h.toFloat() / w
                     requestLayout()
                 }
             }
         }
+        LogUtil.d("onSetUp ok thread"+Thread.currentThread().id)
+
     }
 
     override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
@@ -548,19 +550,21 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
 
 
-        if (heightMode == View.MeasureSpec.AT_MOST || isNormal()) {
+        if (heightMode == View.MeasureSpec.AT_MOST && isNormal()) {
             if (defaultHeightRatio != 0f) {
                 val sizeH = widthSize * defaultHeightRatio
-                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST))
                 return
             }
 
             if (videoHeightRatio != 0f) {
                 val sizeH = widthSize * videoHeightRatio
-                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST))
+                return
             } else {
                 val sizeH = widthSize * DEFAULT_HEIGHT_RATIO
-                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY))
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST))
+                return
             }
         }
 

@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.view.Surface
 import com.hapi.player.cache.HttpProxyCacheManager
+import com.hapi.player.utils.LogUtil
 
 abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
 
@@ -40,11 +41,12 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
             val proxy = HttpProxyCacheManager.getHttpProxyCacheManager()
                 .getProxy(context.applicationContext)
             val proxyUrl = proxy.getProxyUrl(str)
+            LogUtil.d("setUp  proxyUrl  $proxyUrl")
             Uri.parse(proxyUrl)
         } else {
             uir
         }
-        originUri = proxyUrl
+        originUri = uir
         setUpAfterDealUrl(proxyUrl,headers, preLoading)
     }
 

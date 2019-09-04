@@ -509,7 +509,7 @@ public class DefaultController extends FrameLayout implements IController, View.
         } else if (v == mRetry) {
             mPlayer.resume();
         } else if (v == mReplay) {
-            mRetry.performClick();
+            mPlayer.resume();
         }  else if (v == this) {
             if (mPlayer.isPlaying()
                     || mPlayer.isPaused()
