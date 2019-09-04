@@ -20,8 +20,8 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
     private var continueFromLastPosition = false
     private var mBufferPercentage: Int = 0
     private var mHeaders: Map<String, String>? = null
+    private var isUsePreLoad = false
 
-    private var isPreLoading = false
     /**
      * 原生 播放器
      */
@@ -50,32 +50,25 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         mMediaPlayer.isLooping = mPlayerConfig.loop
     }
 
-    override fun playAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
-        isPreLoading = preLoading
-        mUrl = uir
-        mHeaders = headers
-        openMedia()
-    }
-
 
     override fun setUpAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
         mUrl = uir
         mHeaders = headers
-        isPreLoading = preLoading
-        if(isPreLoading){
+        isUsePreLoad = preLoading
+        if(isUsePreLoad){
             openMedia()
         }
     }
 
     override fun startPlay() {
-
-        if (isPreLoading && mCurrentState == STATE_PREPARED) {
+        if (mCurrentState == STATE_PRELOADED_WAITING || mCurrentState == STATE_PREPARED) {
             startCall.invoke()
-            isPreLoading = false
             return
         }
-        if(isPreLoading){
-            isPreLoading = false
+        if(mCurrentState == STATE_PRELOADING){
+            isUsePreLoad = false
+            mCurrentState = STATE_PREPARING
+            mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             return
         }
         openMedia()
@@ -83,14 +76,18 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
 
 
     private fun openMedia() {
-        mCurrentState = STATE_PREPARING
-        mPlayerStatusListener.onPlayStateChanged(mCurrentState)
 
         try {
             savePotion()
             pause()
             mMediaPlayer.stop()
             mMediaPlayer.reset()
+            mCurrentState=  if(isUsePreLoad){
+                STATE_PRELOADING
+            }else{
+                STATE_PREPARING
+            }
+            mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             mMediaPlayer.setDataSource(context.applicationContext, mUrl, mHeaders)
             mMediaPlayer.prepareAsync()
         } catch (e: Exception) {
@@ -170,15 +167,16 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         }
     }
     private val mOnPreparedListener = MediaPlayer.OnPreparedListener { mp ->
-        mCurrentState = STATE_PREPARED
-        mPlayerStatusListener.onPlayStateChanged(mCurrentState)
-        LogUtil.d("onPrepared ——> STATE_PREPARED")
 
-        if (isPreLoading) {
+
+        if (isUsePreLoad) {
             mCurrentState = STATE_PRELOADED_WAITING
             mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             LogUtil.d("onPrepared ——> STATE_PREPARED   wait noticePreLoading")
         } else {
+            mCurrentState = STATE_PREPARED
+            mPlayerStatusListener.onPlayStateChanged(mCurrentState)
+            LogUtil.d("onPrepared ——> STATE_PREPARED")
             startCall.invoke()
         }
     }

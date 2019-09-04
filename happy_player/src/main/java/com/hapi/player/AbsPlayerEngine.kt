@@ -15,11 +15,9 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
     private var listeners = ArrayList<PlayerStatusListener>()
     protected var mPlayerConfig = PlayerConfig()
     private var originUri: Uri? = null
-
     protected var mCurrentState = PlayerStatus.STATE_IDLE
-
-
     private var isLossPause = false
+
     private var audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener =
         AudioManager.OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
@@ -144,9 +142,6 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
 
     abstract fun readPlayerConfig()
 
-    abstract fun playAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean)
-
-
     override fun addPlayStatusListener(lister: PlayerStatusListener, add: Boolean) {
         if (add) {
             listeners.add(lister)
@@ -190,6 +185,14 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
 
     override fun isCompleted(): Boolean {
         return mCurrentState == PlayerStatus.STATE_COMPLETED
+    }
+
+    override fun isPreLoading(): Boolean {
+        return mCurrentState == PlayerStatus.STATE_PRELOADING
+    }
+
+    override fun isPreLoaded(): Boolean {
+        return mCurrentState == PlayerStatus.STATE_PRELOADED_WAITING
     }
 
 

@@ -8,19 +8,19 @@ interface IPlayer {
      * 获得当前播放url
      */
 
-    fun getCurrentUrl():Uri?
+    fun getCurrentUrl(): Uri?
 
     /**
      * 开始播放
      *
      * @param preLoading  预加载　　提前异步装载视频　　如果true 装载完成将等待　　startPlay
      */
-    fun setUp(uir: Uri, headers :Map<String, String> ?=null,preLoading:Boolean = false)
+    fun setUp(uir: Uri, headers: Map<String, String>? = null, preLoading: Boolean = false)
 
     /**
      * 取消preLoading　的等待　如果　preLoading　　如果装载完成将直接播放　否则还是等装载完成才播放
      */
-    fun  startPlay()
+    fun startPlay()
 
 
     fun addPlayStatusListener(lister: PlayerStatusListener, isAdd: Boolean)
@@ -37,8 +37,9 @@ interface IPlayer {
     /**
      * 播放配置
      */
-    fun setPlayerConfig(playerConfig:PlayerConfig)
-    fun getPlayerConfig():PlayerConfig
+    fun setPlayerConfig(playerConfig: PlayerConfig)
+
+    fun getPlayerConfig(): PlayerConfig
 
 
     fun seekTo(pos: Int)
@@ -54,7 +55,7 @@ interface IPlayer {
 
     fun getCurrentPlayStatus(): Int
 
-    fun getBufferPercentage():Int
+    fun getBufferPercentage(): Int
 
     /**
      * 获取最大音量
@@ -85,16 +86,18 @@ interface IPlayer {
     fun getCurrentPosition(): Long
 
 
-     fun releasePlayer()
+    fun releasePlayer()
 
-     fun isIdle(): Boolean
-     fun isPreparing(): Boolean
-     fun isPrepared(): Boolean
-     fun isBufferingPlaying(): Boolean
-     fun isBufferingPaused(): Boolean
-     fun isPlaying(): Boolean
-     fun isPaused(): Boolean
-     fun isError(): Boolean
-     fun isCompleted(): Boolean
+    fun isPreLoading(): Boolean
+    fun isPreLoaded(): Boolean
+    fun isIdle(): Boolean
+    fun isPreparing(): Boolean
+    fun isPrepared(): Boolean
+    fun isBufferingPlaying(): Boolean
+    fun isBufferingPaused(): Boolean
+    fun isPlaying(): Boolean
+    fun isPaused(): Boolean
+    fun isError(): Boolean
+    fun isCompleted(): Boolean
 
 }
