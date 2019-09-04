@@ -203,9 +203,13 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         override fun onInfo(mp: MediaPlayer, what: Int, extra: Int): Boolean {
             if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                 // 播放器开始渲染
-                mCurrentState = STATE_PLAYING
-                mPlayerStatusListener.onPlayStateChanged(mCurrentState)
-                LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
+                if(mMediaPlayer.isPlaying){
+                    mCurrentState = STATE_PLAYING
+                    mPlayerStatusListener.onPlayStateChanged(mCurrentState)
+                    LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
+                }else{
+                    LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：视频暂停中 但是切换旋转回调了播放")
+                }
             } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
                 // MediaPlayer暂时不播放，以缓冲更多的数据
                 if (mCurrentState == STATE_PAUSED || mCurrentState == STATE_BUFFERING_PAUSED) {
