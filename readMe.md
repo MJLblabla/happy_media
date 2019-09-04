@@ -2,9 +2,8 @@
 **功能简介**　音频播放，视频全屏\小窗切换播放，缓存播放，横竖屏幕随系统，视频自适应
 
 **使用简介**
-　
-    　　*视频播放*
-        <com.hapi.player.video.HappyVideoPlayer
+
+           <com.hapi.player.video.HappyVideoPlayer
             android:id="@+id/mHappyVideoPlayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,12 +22,12 @@
 **属性接受**
 
  - 属性
- - loop　　　　　　　　　　　循环播放
+ - loop　　　　　　　　　　　 循环播放
  - heightRatio　　　　　　　　wrap_content（wrap_content默认控件高度按视频尺寸和控件宽度适应），heightRatio宽高比例如果设置，高度＝　宽度＊heightRatio
- - isFromLastPosition　　　　是否继续上一次退出时间点播放
- - isUseCache　　　　　　　　是否边下边播
+ - isFromLastPosition　　　　 是否继续上一次退出时间点播放
+ - isUseCache　　　　　　　　 是否边下边播
  - isFirstFrameAsCover　　　　是否第一帧做封面
- - autoChangeOrientation　　　　　　播放后，全屏和非全屏是否跟随手机旋转
+ - autoChangeOrientation　　　播放后，全屏和非全屏是否跟随手机旋转
  - centerCropError　　　　　　非全屏播放时（视频尺寸和控件尺寸不黄金比例时，比如固定控件大小和match_parent,视频缩调整后会有小黑边）　如果宽度和高度小黑边在多少比例内，无视它使用centerCrop去充满屏幕，（比如竖屏视频抖音这类还是没有小黑边好）
  
 
@@ -38,13 +37,13 @@
 
 　　**基本使用步骤**
 　　
-　　　　val audioPlayer = HappyPlayerHelper.newPlayer(context) //音频播放器
+　　　　
+
+        val audioPlayer = HappyPlayerHelper.newPlayer(context) //音频播放器
         
         mHappyVideoPlayer.addController(DefaultController(this))　//视频播放器　
         
-        DefaultController　为默认控制器
-        如果要实现自己控制器ui，则继承　　IController
-        播放
+        (DefaultController　为默认控制器,如果要实现自己控制器ui，则继承IController)
         
         mHappyVideoPlayer.setUp(Uri.parse("https://media.w3.org/2010/05/sintel/trailer.mp4"), null, false)
         mHappyVideoPlayer.startPlay()
@@ -280,5 +279,4 @@ interface IVideoPlayer : IPlayer {
      fun isTinyWindow(): Boolean
      fun isNormal(): Boolean
 }
-
 
