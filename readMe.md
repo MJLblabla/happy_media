@@ -21,14 +21,6 @@
 
 **属性**
 
- - 属性
- - loop　　　　　　　　　　　 循环播放
- - heightRatio　　　　　　　　wrap_content（wrap_content默认控件高度按视频尺寸和控件宽度适应），heightRatio宽高比例如果设置，高度＝　宽度＊heightRatio
- - isFromLastPosition　　　　 是否继续上一次退出时间点播放
- - isUseCache　　　　　　　　 是否边下边播
- - isFirstFrameAsCover　　　　是否第一帧做封面
- - autoChangeOrientation　　　播放后，全屏和非全屏是否跟随手机旋转
- - centerCropError　　　　　　非全屏播放时（视频尺寸和控件尺寸不黄金比例时，比如固定控件大小和match_parent,视频缩调整后会有小黑边）　如果宽度和高度小黑边在多少比例内，无视它使用centerCrop去充满屏幕，（比如竖屏视频抖音这类还是没有小黑边好）
  
 属性 | 默认值 |  功能  
 -|-|-
