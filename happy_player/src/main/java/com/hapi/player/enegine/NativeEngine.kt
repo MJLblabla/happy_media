@@ -82,6 +82,7 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
             pause()
             mMediaPlayer.stop()
             mMediaPlayer.reset()
+            mMediaPlayer.isLooping = mPlayerConfig.loop
             mCurrentState=  if(isUsePreLoad){
                 STATE_PRELOADING
             }else{
