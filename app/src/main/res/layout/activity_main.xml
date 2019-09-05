@@ -33,39 +33,6 @@
             app:autoChangeOrientation ="true"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/textView"/>
-    <Button
-
-            android:text="开始"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnStart"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp" app:layout_constraintEnd_toStartOf="@+id/btnPause"
-            android:layout_marginEnd="86dp" android:layout_marginRight="86dp" android:layout_marginBottom="141dp"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-    <Button
-            android:text="暂停"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnPause" android:layout_marginLeft="86dp" android:layout_marginStart="86dp"
-            app:layout_constraintStart_toEndOf="@+id/btnStart" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="133dp" android:layout_marginRight="133dp" android:layout_marginBottom="12dp"
-            app:layout_constraintBottom_toTopOf="@+id/btnResume" android:layout_marginTop="542dp"
-            app:layout_constraintTop_toTopOf="parent"/>
-    <Button
-            android:text="继续"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnResume" app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="291dp"
-            android:layout_marginStart="291dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp" android:layout_marginBottom="81dp"
-            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@+id/btnPause"/>
-    <Button
-            android:text="Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" tools:layout_editor_absoluteY="634dp"
-            tools:layout_editor_absoluteX="21dp" android:id="@+id/b2"/>
 
 
 </android.support.constraint.ConstraintLayout>

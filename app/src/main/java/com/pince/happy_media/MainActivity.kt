@@ -13,25 +13,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-
         mHappyVideoPlayer.addController(DefaultController(this))
-
         mHappyVideoPlayer.setUp(Uri.parse("https://media.w3.org/2010/05/sintel/trailer.mp4"), null, false)
 
-        b2.setOnClickListener {
+    }
 
-        }
-        btnStart.setOnClickListener {
+
+    override fun onBackPressed() {
+
+        if(mHappyVideoPlayer.isTinyWindow()){
+            mHappyVideoPlayer.exitTinyWindow()
+            return
         }
 
-        btnPause.setOnClickListener {
-            mHappyVideoPlayer.enterTinyWindow()
-        }
-
-        btnResume.setOnClickListener {
+        if(mHappyVideoPlayer.isFullScreen()){
             mHappyVideoPlayer.exitFullScreen()
+            return
         }
-
+        return super.onBackPressed()
     }
 
 
