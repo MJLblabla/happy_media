@@ -1,9 +1,7 @@
 ﻿## **happy_media** ## 快速开启音视频播放
 **功能简介**　音频播放，视频全屏\小窗切换播放，缓存播放，横竖屏幕随系统，视频自适应
 
-![Alt text](https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-171456_happy_media.jpg "optional title")
-![Alt text](https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-171516_happy_media.jpg "optional title")
-![Alt text](https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-175258_happy_media.jpg "optional title")
+
 
 
 **使用简介**
@@ -343,6 +341,12 @@ interface IVideoPlayer : IPlayer {
      -keep public class com.hapi.player.been.**{*;}　
 
 
-  [1]: https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-171456_happy_media.jpg
+
+
+![Alt text](https://github.com/MJLblabla/happy_media/blob/master/img/20190905_180735.jpg "optional title")
+![Alt text](https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-171516_happy_media.jpg "optional title")
+![Alt text](https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-175258_happy_media.jpg "optional title")
+
+  [1]: https://github.com/MJLblabla/happy_media/blob/master/img/20190905_180735.jpg
   [2]: https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-171516_happy_media.jpg
   [3]: https://github.com/MJLblabla/happy_media/blob/master/img/Screenshot_20190905-175258_happy_media.jpg
