@@ -58,6 +58,10 @@ centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸�
         mHappyVideoPlayer.startPlay()
         监听播放状态：（播放控制器本身也是一个监听器）
         mHappyVideoPlayer.setListener(lister: PlayerStatusListener,isAdd: Boolean)
+        
+        
+        
+ 
 
 
 **播放器状态监听**
@@ -87,10 +91,20 @@ centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸�
 
 **播放状态回调**
 
-        /**
+    public class PlayerStatus {
+   
+
+
+    /**
      * 播放未开始
      **/
-    public static final int STATE_IDLE = 0;
+    public static final int STATE_IDLE = -1;
+
+
+    /**
+     * 播放预装载中
+     */
+    public static final int STATE_PRELOADING = 0;
     /**
      * 播放准备中
      **/
@@ -159,21 +173,22 @@ interface IPlayer {
      * 获得当前播放url
      */
 
-    fun getCurrentUrl():Uri?
+    fun getCurrentUrl(): Uri?
 
     /**
-     * 设置播放参数参数
-     * @param preLoading  预加载　　提前异步装载视频　　如果true 装载完成将等待　　noticePreLoading播放
+     * 开始播放
+     *
+     * @param preLoading  预加载　　提前异步装载视频　　如果true 装载完成将等待　　startPlay
      */
-    fun setUp(uir: Uri, headers :Map<String, String> ?=null,preLoading:Boolean = false)
+    fun setUp(uir: Uri, headers: Map<String, String>? = null, preLoading: Boolean = false)
 
     /**
      * 取消preLoading　的等待　如果　preLoading　　如果装载完成将直接播放　否则还是等装载完成才播放
      */
-    fun  startPlay()
+    fun startPlay()
 
 
-    fun addPlayStatusListener(lister: PlayerStatusListener,isAdd: Boolean)
+    fun addPlayStatusListener(lister: PlayerStatusListener, isAdd: Boolean)
     /**
      * 暂停
      */
@@ -187,8 +202,9 @@ interface IPlayer {
     /**
      * 播放配置
      */
-    fun setPlayerConfig(playerConfig:PlayerConfig)
-    fun getPlayerConfig():PlayerConfig
+    fun setPlayerConfig(playerConfig: PlayerConfig)
+
+    fun getPlayerConfig(): PlayerConfig
 
 
     fun seekTo(pos: Int)
@@ -204,7 +220,7 @@ interface IPlayer {
 
     fun getCurrentPlayStatus(): Int
 
-    fun getBufferPercentage():Int
+    fun getBufferPercentage(): Int
 
     /**
      * 获取最大音量
@@ -235,17 +251,19 @@ interface IPlayer {
     fun getCurrentPosition(): Long
 
 
-     fun releasePlayer()
+    fun releasePlayer()
 
-     fun isIdle(): Boolean
-     fun isPreparing(): Boolean
-     fun isPrepared(): Boolean
-     fun isBufferingPlaying(): Boolean
-     fun isBufferingPaused(): Boolean
-     fun isPlaying(): Boolean
-     fun isPaused(): Boolean
-     fun isError(): Boolean
-     fun isCompleted(): Boolean
+    fun isPreLoading(): Boolean
+    fun isPreLoaded(): Boolean
+    fun isIdle(): Boolean
+    fun isPreparing(): Boolean
+    fun isPrepared(): Boolean
+    fun isBufferingPlaying(): Boolean
+    fun isBufferingPaused(): Boolean
+    fun isPlaying(): Boolean
+    fun isPaused(): Boolean
+    fun isError(): Boolean
+    fun isCompleted(): Boolean
 
 }
 
@@ -253,6 +271,7 @@ interface IPlayer {
 
 interface IVideoPlayer : IPlayer {
 
+    
     /**
      * @param cover 封面
      * @param preLoading   预加载　　提前异步装载视频　　如果true 装载完成将等待　　startPlay
@@ -313,3 +332,7 @@ interface IVideoPlayer : IPlayer {
      fun isNormal(): Boolean
 }
 
+
+**混淆配置**
+     
+     -keep public class com.hapi.player.been.**{*;}　
