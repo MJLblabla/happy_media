@@ -12,6 +12,12 @@ class FullActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_full)
         mHappyVideoPlayer.addController(DefaultController(this))
-        mHappyVideoPlayer.setUp(Uri.parse("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319212559089721.mp4"), null, true)
+        mHappyVideoPlayer.setUp(Uri.parse("https://cdn.static.orzzhibo.com/20190936/d0c134694343d1a83044ffa84afc4972.mp4"), null, true)
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mHappyVideoPlayer.releasePlayer()
     }
 }

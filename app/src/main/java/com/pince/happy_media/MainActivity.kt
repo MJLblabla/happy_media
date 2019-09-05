@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
 
 
         mHappyVideoPlayer.addController(DefaultController(this))
+        lifecycle.addObserver(mHappyVideoPlayer)
         mHappyVideoPlayer.setUp(
             Uri.parse("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319212559089721.mp4"),
             null,
