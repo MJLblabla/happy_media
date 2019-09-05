@@ -38,7 +38,25 @@ centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸�
 
 ----------
 
-　**基本使用步骤**
+**导入**
+
+    	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+	
+
+    	dependencies {
+	        implementation 'com.github.MJLblabla:happy_media:Tag'
+	}
+	
+	
+	
+	
+
+**基本使用步骤**
 　　
 　　　　
 
