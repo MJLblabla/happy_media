@@ -35,10 +35,10 @@ public class LifecycleVideoView extends HappyVideoPlayer implements LifecycleObs
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    public void onDestroy() {
-        releasePlayer();
-    }
+//    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//    public void onDestroy() {
+//        releasePlayer();
+//    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void pause(LifecycleOwner lifecycleOwner) {

@@ -14,10 +14,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        mHappyVideoPlayer.addController(DefaultController(this))
+        val ctroller = DefaultController(this)
+
+        mHappyVideoPlayer.addController(ctroller)
+        ctroller.setTitle("测试视频好帅")
         lifecycle.addObserver(mHappyVideoPlayer)
         mHappyVideoPlayer.setUp(
-            Uri.parse("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319212559089721.mp4"),
+            Uri.parse("http://vfx.mtime.cn/Video/2019/03/18/mp4/190318231014076505.mp4"),
             null,
             true
         )

@@ -7,6 +7,7 @@ import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -108,8 +109,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mContainer = TinyFloatView(context)
 
         (mContainer as TinyFloatView).parentWindType = { mCurrentMode }
-        mContainer.setBackgroundColor(Color.BLACK)
-
 
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -162,11 +161,13 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                 STATE_ERROR -> {
                     mContainer.keepScreenOn = false
                 }
+
+                STATE_PLAYING ->{
+                    coverImg.visibility = View.GONE
+                }
             }
 
-            if (status > STATE_PREPARED) {
-                coverImg.visibility = View.GONE
-            }
+
         }
 
         override fun onPlayModeChanged(model: Int) {
@@ -195,12 +196,12 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
 
     override fun setCover(uir: Uri?) {
-        if (mPlayerEngine.getCurrentPlayStatus() <= STATE_PREPARED) {
+
             coverImg.visibility = View.VISIBLE
             Glide.with(context)
                 .load(uir)
                 .into(coverImg)
-        }
+
     }
 
     override fun setUp(uir: Uri, headers: Map<String, String>?, cover: Uri, preLoading: Boolean) {
@@ -484,6 +485,13 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mController?.detach()
     }
 
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        LogUtil.d("onDetachedFromWindow   releasePlayer")
+        releasePlayer()
+    }
+
     override fun onSurfaceTextureAvailable(p0: SurfaceTexture?, p1: Int, p2: Int) {
         mSurfaceTexture = p0
         mSurface = Surface(mSurfaceTexture)
@@ -568,13 +576,15 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
 
 
+
         if (heightMode == View.MeasureSpec.AT_MOST && isNormal()) {
             if (defaultHeightRatio != 0f) {
                 val sizeH = widthSize * defaultHeightRatio
                 super.onMeasure(
                     widthMeasureSpec,
-                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST)
+                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY)
                 )
+               // setMeasuredDimension(widthSize, sizeH.toInt())
                 return
             }
 
@@ -582,20 +592,22 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                 val sizeH = widthSize * videoHeightRatio
                 super.onMeasure(
                     widthMeasureSpec,
-                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST)
+                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY)
                 )
+               // setMeasuredDimension(widthSize, sizeH.toInt())
                 return
             } else {
                 val sizeH = widthSize * DEFAULT_HEIGHT_RATIO
                 super.onMeasure(
                     widthMeasureSpec,
-                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.AT_MOST)
+                    MeasureSpec.makeMeasureSpec(sizeH.toInt(), MeasureSpec.EXACTLY)
                 )
+                //setMeasuredDimension(widthSize, sizeH.toInt())
                 return
             }
         }
-
-
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
+
     }
 }

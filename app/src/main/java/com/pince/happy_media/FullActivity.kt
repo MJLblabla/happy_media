@@ -16,8 +16,5 @@ class FullActivity : AppCompatActivity() {
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mHappyVideoPlayer.releasePlayer()
-    }
+
 }
