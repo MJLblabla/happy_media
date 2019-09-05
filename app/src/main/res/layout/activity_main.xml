@@ -18,7 +18,7 @@
             app:layout_constraintVertical_bias="1.0"/>
 
 
-    <com.hapi.player.video.HappyVideoPlayer
+    <com.hapi.player.video.LifecycleVideoView
 
             android:id="@+id/mHappyVideoPlayer"
             android:layout_width="match_parent"
@@ -33,6 +33,12 @@
             app:autoChangeOrientation ="true"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/textView"/>
+    <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_marginStart="33dp"
+            android:layout_marginBottom="31dp" android:text="试试竖屏"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"/>
 
 
 </android.support.constraint.ConstraintLayout>

@@ -6,8 +6,6 @@ import android.view.TextureView
 import android.view.View
 import com.hapi.player.PlayerStatus.MODE_FULL_SCREEN
 
-import com.hapi.player.PlayerStatus.MODE_NORMAL
-
 /**
  *
  */
@@ -58,8 +56,8 @@ internal class HappyTextureView : TextureView {
 //        }
 
 
-        var width = View.getDefaultSize(videoWidth, widthMeasureSpec)
-        var height = View.getDefaultSize(videoHeight, heightMeasureSpec)
+        var widthV = videoWidth
+        var heightV = videoHeight
 
         val widthSpecMode = View.MeasureSpec.getMode(widthMeasureSpec)
         val widthSpecSize = View.MeasureSpec.getSize(widthMeasureSpec)
@@ -71,15 +69,15 @@ internal class HappyTextureView : TextureView {
         if (videoWidth > 0 && videoHeight > 0) {
 
 
-            val hightRatio = heightSpecSize / height.toFloat()
-            val withRatio = widthSpecSize / width.toFloat()
+            val hightRatio = heightSpecSize / heightV.toFloat()
+            val withRatio = widthSpecSize / widthV.toFloat()
             /**
              * 横瓶播放器　播放横屏视频　
              */
 
-            if (((width > height && widthSpecSize > heightSpecSize)
+            if (((widthV > heightV && widthSpecSize > heightSpecSize)
 
-                        || (width < height && widthSpecSize < heightSpecSize))
+                        || (widthV < heightV && widthSpecSize < heightSpecSize))
 
                 && parentWindType?.invoke() != MODE_FULL_SCREEN
 
@@ -90,63 +88,70 @@ internal class HappyTextureView : TextureView {
                     hightRatio
                 }
 
-                val tempW = (height * max - heightSpecSize) / heightSpecSize
+                val tempW = (heightV * max - heightSpecSize) / heightSpecSize
                 val tempH = (tempW * max - widthSpecSize) / widthMeasureSpec
 
                 if (Math.abs(tempH) > centerCropError && Math.abs(tempW) > centerCropError) {
-
-                    height = (height * max).toInt()
-                    width = (width * max).toInt()
+                    heightV = (heightV * max).toInt()
+                    widthV = (widthV * max).toInt()
+                    setMeasuredDimension(widthV, heightV)
+                    return
                 }
-            } else {
+            }
 
 
-                if (widthSpecMode == View.MeasureSpec.EXACTLY && heightSpecMode == View.MeasureSpec.EXACTLY) {
+            if (widthSpecMode == View.MeasureSpec.EXACTLY && heightSpecMode == View.MeasureSpec.EXACTLY) {
                     // the size is fixed
-                    width = widthSpecSize
-                    height = heightSpecSize
+                    widthV = widthSpecSize
+                    heightV = heightSpecSize
                     // for compatibility, we adjust size based on aspect ratio
-                    if (videoWidth * height < width * videoHeight) {
-                        width = height * videoWidth / videoHeight
-                    } else if (videoWidth * height > width * videoHeight) {
-                        height = width * videoHeight / videoWidth
+                    if (videoWidth * heightV < widthV * videoHeight) {
+                        widthV = heightV * videoWidth / videoHeight
+                    } else if (videoWidth * heightV > widthV * videoHeight) {
+                        heightV = widthV * videoHeight / videoWidth
                     }
                 } else if (widthSpecMode == View.MeasureSpec.EXACTLY) {
                     // only the width is fixed, adjust the height to match aspect ratio if possible
-                    width = widthSpecSize
-                    height = width * videoHeight / videoWidth
-                    if (heightSpecMode == View.MeasureSpec.AT_MOST && height > heightSpecSize) {
+                    widthV = widthSpecSize
+                    heightV = widthV * videoHeight / videoWidth
+                    if (heightSpecMode == View.MeasureSpec.AT_MOST && heightV > heightSpecSize) {
                         // couldn't match aspect ratio within the constraints
-                        height = heightSpecSize
-                        width = height * videoWidth / videoHeight
+                        heightV = heightSpecSize
+                        widthV = heightV * videoWidth / videoHeight
                     }
                 } else if (heightSpecMode == View.MeasureSpec.EXACTLY) {
                     // only the height is fixed, adjust the width to match aspect ratio if possible
-                    height = heightSpecSize
-                    width = height * videoWidth / videoHeight
-                    if (widthSpecMode == View.MeasureSpec.AT_MOST && width > widthSpecSize) {
+                    heightV = heightSpecSize
+                    widthV = heightV * videoWidth / videoHeight
+                    if (widthSpecMode == View.MeasureSpec.AT_MOST && widthV > widthSpecSize) {
                         // couldn't match aspect ratio within the constraints
-                        width = widthSpecSize
-                        height = width * videoHeight / videoWidth
+                        widthV = widthSpecSize
+                        heightV = widthV * videoHeight / videoWidth
                     }
                 } else {
                     // neither the width nor the height are fixed, try to use actual video size
-                    width = videoWidth
-                    height = videoHeight
-                    if (heightSpecMode == View.MeasureSpec.AT_MOST && height > heightSpecSize) {
+                    widthV = videoWidth
+                    heightV = videoHeight
+                    if (heightSpecMode == View.MeasureSpec.AT_MOST && heightV > heightSpecSize) {
                         // too tall, decrease both width and height
-                        height = heightSpecSize
-                        width = height * videoWidth / videoHeight
+                        heightV = heightSpecSize
+                        widthV = heightV * videoWidth / videoHeight
                     }
-                    if (widthSpecMode == View.MeasureSpec.AT_MOST && width > widthSpecSize) {
+                    if (widthSpecMode == View.MeasureSpec.AT_MOST && widthV > widthSpecSize) {
                         // too wide, decrease both width and height
-                        width = widthSpecSize
-                        height = width * videoHeight / videoWidth
+                        widthV = widthSpecSize
+                        heightV = widthV * videoHeight / videoWidth
                     }
                 }
-            }
-        }
 
-        setMeasuredDimension(width, height)
+                 setMeasuredDimension(widthV, heightV)
+                 return
+            }
+
+
+        setMeasuredDimension(widthSpecSize, heightSpecSize)
+
+
+
     }
 }

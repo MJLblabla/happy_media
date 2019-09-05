@@ -21,6 +21,7 @@ class PlayerConfig {
 
 
     fun setLoop(loop: Boolean): PlayerConfig {
+        this.loop = loop
         return this
     }
 

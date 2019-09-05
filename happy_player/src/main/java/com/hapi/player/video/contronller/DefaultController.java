@@ -38,17 +38,12 @@ public class DefaultController extends FrameLayout implements IController, View.
     private float mGestureDownBrightness;
     private int mGestureDownVolume;
     private long mNewPosition;
-
-
     private ImageView mCenterStart;
-
     private LinearLayout mTop;
     private ImageView mBack;
     private TextView mTitle;
     private LinearLayout mBatteryTime;
-
     private TextView mTime;
-
     private LinearLayout mBottom;
     private ImageView mRestartPause;
     private TextView mPosition;
@@ -56,37 +51,24 @@ public class DefaultController extends FrameLayout implements IController, View.
     private SeekBar mSeek;
     private TextView mClarity;
     private ImageView mFullScreen;
-
-    private TextView mLength;
-
     private LinearLayout mLoading;
     private TextView mLoadText;
-
     private LinearLayout mChangePositon;
     private TextView mChangePositionCurrent;
     private ProgressBar mChangePositionProgress;
-
     private LinearLayout mChangeBrightness;
     private ProgressBar mChangeBrightnessProgress;
-
     private LinearLayout mChangeVolume;
     private ProgressBar mChangeVolumeProgress;
-
     private LinearLayout mError;
     private TextView mRetry;
-
     private LinearLayout mCompleted;
     private TextView mReplay;
-    // private Button btnUnLocked;
-
     private boolean topBottomVisible;
     private CountDownTimer mDismissTopBottomCountDownTimer;
-
     private List<Clarity> clarities;
     private int defaultClarityIndex;
-
     private TextView tvTinyWindow;
-
 
     public DefaultController(@NonNull Context context) {
         super(context);
@@ -113,15 +95,11 @@ public class DefaultController extends FrameLayout implements IController, View.
     private void init() {
 
         LayoutInflater.from(mContext).inflate(R.layout.tx_video_palyer_controller, this, true);
-
         mCenterStart = (ImageView) findViewById(R.id.center_start);
-
         mTop = (LinearLayout) findViewById(R.id.top);
         mBack = (ImageView) findViewById(R.id.back);
-        //  btnUnLocked = (Button) findViewById(R.id.btnUnLocked);
         mTitle = (TextView) findViewById(R.id.title);
         mBatteryTime = (LinearLayout) findViewById(R.id.battery_time);
-
         mTime = (TextView) findViewById(R.id.time);
         tvTinyWindow = findViewById(R.id.tvTinyWindow);
         mBottom = (LinearLayout) findViewById(R.id.bottom);
@@ -131,8 +109,6 @@ public class DefaultController extends FrameLayout implements IController, View.
         mSeek = (SeekBar) findViewById(R.id.seek);
         mFullScreen = (ImageView) findViewById(R.id.full_screen);
         mClarity = (TextView) findViewById(R.id.clarity);
-        mLength = (TextView) findViewById(R.id.length);
-
         mLoading = (LinearLayout) findViewById(R.id.loading);
         mLoadText = (TextView) findViewById(R.id.load_text);
         mChangePositon = (LinearLayout) findViewById(R.id.change_position);
@@ -158,7 +134,6 @@ public class DefaultController extends FrameLayout implements IController, View.
         tvTinyWindow.setOnClickListener(this);
     }
 
-
     /**
      * 开启更新进度的计时器。
      */
@@ -183,24 +158,13 @@ public class DefaultController extends FrameLayout implements IController, View.
         mUpdateProgressTimer.schedule(mUpdateProgressTimerTask, 0, 1000);
     }
 
-
     public void setTitle(String title) {
         mTitle.setText(title);
     }
 
-
     public ImageView playButton() {
         return mCenterStart;
     }
-
-
-    public void setLenght(long length) {
-        mLength.setText(PalyerUtil.formatTime(length));
-    }
-
-
-
-
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -351,18 +315,11 @@ public class DefaultController extends FrameLayout implements IController, View.
         cancelDismissTopBottomTimer();
         mSeek.setProgress(0);
         mSeek.setSecondaryProgress(0);
-
         mCenterStart.setVisibility(View.VISIBLE);
-
-
         mBottom.setVisibility(View.GONE);
         mFullScreen.setImageResource(R.drawable.ic_player_enlarge);
-
-        mLength.setVisibility(View.VISIBLE);
-
         mTop.setVisibility(View.VISIBLE);
         mBack.setVisibility(View.GONE);
-
         mLoading.setVisibility(View.GONE);
         mError.setVisibility(View.GONE);
         mCompleted.setVisibility(View.GONE);
@@ -382,15 +339,21 @@ public class DefaultController extends FrameLayout implements IController, View.
                 mTop.setVisibility(View.GONE);
                 mBottom.setVisibility(View.GONE);
                 mCenterStart.setVisibility(View.GONE);
-                mLength.setVisibility(View.GONE);
+
                 break;
             case STATE_PREPARED:
 
-                startUpdateProgressTimer();
                 break;
             case STATE_PLAYING:
+                if(mPlayer.isFullScreen()){
+                    tvTinyWindow.setVisibility(View.GONE);
+                }else {
+                    tvTinyWindow.setVisibility((View.VISIBLE));
+                }
+                mCenterStart.setVisibility(View.GONE);
                 mLoading.setVisibility(View.GONE);
                 mRestartPause.setImageResource(R.drawable.ic_player_pause);
+                startUpdateProgressTimer();
                 startDismissTopBottomTimer();
                 break;
             case STATE_PAUSED:
@@ -473,9 +436,9 @@ public class DefaultController extends FrameLayout implements IController, View.
             }
         }
         if (v == mCenterStart) {
-            if (mPlayer.isIdle()) {
+
                 mPlayer.startPlay();
-            }
+
         } else if (v == mBack) {
             if (mPlayer.isFullScreen()) {
                 mPlayer.exitFullScreen();

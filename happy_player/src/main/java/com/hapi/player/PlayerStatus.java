@@ -8,7 +8,13 @@ public class PlayerStatus {
     /**
      * 播放未开始
      **/
-    public static final int STATE_IDLE = 0;
+    public static final int STATE_IDLE = -1;
+
+
+    /**
+     * 播放预装载中
+     */
+    public static final int STATE_PRELOADING = 0;
     /**
      * 播放准备中
      **/

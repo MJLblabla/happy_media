@@ -3,11 +3,10 @@ package com.hapi.player.utils
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import com.hapi.player.been.MediaParams
-import com.hapi.player.been.room.MediaDataBase
+import com.hapi.player.room.MediaDataBase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

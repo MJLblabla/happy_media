@@ -1,4 +1,4 @@
-package com.hapi.player.been.room;
+package com.hapi.player.room;
 
 
 import android.arch.persistence.room.Database;

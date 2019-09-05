@@ -17,17 +17,15 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
 
     private var mUrl: Uri? = null
 
-    private var mCurrentState = STATE_IDLE
-
     private var continueFromLastPosition = false
     private var mBufferPercentage: Int = 0
     private var mHeaders: Map<String, String>? = null
+    private var isUsePreLoad = false
 
-    private var isPreLoading = false
     /**
      * 原生 播放器
      */
-    val mMediaPlayer: MediaPlayer by lazy {
+    private val mMediaPlayer: MediaPlayer by lazy {
         val m = MediaPlayer()
         m.setAudioStreamType(AudioManager.STREAM_MUSIC)
         m.setOnPreparedListener(mOnPreparedListener)
@@ -39,33 +37,6 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         m
     }
 
-
-    /**
-     * 音频焦点
-     */
-    private val mAudioManager: AudioManager by lazy {
-        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager
-    }
-
-    private fun reqestFouces(){
-        mAudioManager.requestAudioFocus(
-            audioFocusChangeListener,
-            AudioManager.STREAM_MUSIC,
-            AudioManager.AUDIOFOCUS_GAIN
-        )
-    }
-
-    private var audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener =
-        AudioManager.OnAudioFocusChangeListener { focusChange ->
-            when (focusChange) {
-                AudioManager.AUDIOFOCUS_LOSS -> pause()
-                else -> {
-
-                }
-            }
-        }
-
     override fun setOnVideoSizeChangedListener(videoSizeChangedListener: MediaPlayer.OnVideoSizeChangedListener) {
         mMediaPlayer.setOnVideoSizeChangedListener(videoSizeChangedListener)
     }
@@ -74,60 +45,49 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         mMediaPlayer.setSurface(surface)
     }
 
-
     override fun readPlayerConfig() {
         continueFromLastPosition = mPlayerConfig.isFromLastPosition
         mMediaPlayer.isLooping = mPlayerConfig.loop
     }
 
-    override fun playAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
-        isPreLoading = preLoading
-        mUrl = uir
-        mHeaders = headers
-        openMedia()
-    }
-
-
 
     override fun setUpAfterDealUrl(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
-
         mUrl = uir
         mHeaders = headers
-        isPreLoading = preLoading
-        if(isPreLoading){
+        isUsePreLoad = preLoading
+        if(isUsePreLoad){
             openMedia()
         }
     }
 
-
     override fun startPlay() {
-
-        if (isPreLoading && mCurrentState == STATE_PREPARED) {
+        if (mCurrentState == STATE_PRELOADED_WAITING || mCurrentState == STATE_PREPARED) {
             startCall.invoke()
-            isPreLoading = false
             return
         }
-        if(isPreLoading){
-            isPreLoading = false
+        if(mCurrentState == STATE_PRELOADING){
+            isUsePreLoad = false
+            mCurrentState = STATE_PREPARING
+            mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             return
         }
-
-
         openMedia()
-
-
     }
 
 
     private fun openMedia() {
-        mCurrentState = STATE_PREPARING
-        mPlayerStatusListener.onPlayStateChanged(mCurrentState)
 
         try {
             savePotion()
             pause()
             mMediaPlayer.stop()
             mMediaPlayer.reset()
+            mCurrentState=  if(isUsePreLoad){
+                STATE_PRELOADING
+            }else{
+                STATE_PREPARING
+            }
+            mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             mMediaPlayer.setDataSource(context.applicationContext, mUrl, mHeaders)
             mMediaPlayer.prepareAsync()
         } catch (e: Exception) {
@@ -135,15 +95,6 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
             mCurrentState = STATE_ERROR
             mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             LogUtil.d("            mMediaPlayer.prepareAsync() 准备失败")
-        }
-    }
-
-
-    private fun savePotion() {
-        if (isPlaying() || isBufferingPlaying() || isBufferingPaused() || isPaused()) {
-            PalyerUtil.savePlayPosition(context, mUrl?.path, getCurrentPosition().toInt())
-        } else if (isCompleted()) {
-            PalyerUtil.savePlayPosition(context, mUrl?.path, 0)
         }
     }
 
@@ -164,6 +115,7 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
     }
 
     override fun resume() {
+
         if (mCurrentState == STATE_PAUSED) {
             mMediaPlayer.start()
             mCurrentState = STATE_PLAYING
@@ -186,23 +138,6 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         mMediaPlayer.seekTo(pos)
     }
 
-
-    override fun setVolume(volume: Int) {
-        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
-    }
-
-    override fun getCurrentPlayStatus(): Int {
-        return mCurrentState;
-    }
-
-    override fun getMaxVolume(): Int {
-        return mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-    }
-
-    override fun getVolume(): Int {
-        return mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-    }
-
     override fun getDuration(): Long {
         return mMediaPlayer.duration.toLong()
     }
@@ -217,39 +152,32 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
 
     override fun releasePlayer() {
         super.releasePlayer()
-        mCurrentState = STATE_IDLE
-        mAudioManager.abandonAudioFocus(audioFocusChangeListener)
         mMediaPlayer.release()
-        mPlayerStatusListener.onPlayStateChanged(mCurrentState)
-        savePotion()
-
-        Runtime.getRuntime().gc()
     }
 
     private val startCall = {
         reqestFouces()
+        isUsePreLoad=false
         mMediaPlayer.start()
         // 从上次的保存位置播放
         if (continueFromLastPosition) {
-            val savedPlayPosition = PalyerUtil.getSavedPlayPosition(context, mUrl?.path)
+            val savedPlayPosition =getLastPosition()
             if (savedPlayPosition > 0) {
                 mMediaPlayer.seekTo(savedPlayPosition.toInt())
             }
         }
     }
     private val mOnPreparedListener = MediaPlayer.OnPreparedListener { mp ->
-        mCurrentState = STATE_PREPARED
-        mPlayerStatusListener.onPlayStateChanged(mCurrentState)
-        LogUtil.d("onPrepared ——> STATE_PREPARED")
-
-        if (isPreLoading) {
+        if (isUsePreLoad) {
             mCurrentState = STATE_PRELOADED_WAITING
             mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             LogUtil.d("onPrepared ——> STATE_PREPARED   wait noticePreLoading")
         } else {
+            mCurrentState = STATE_PREPARED
+            mPlayerStatusListener.onPlayStateChanged(mCurrentState)
+            LogUtil.d("onPrepared ——> STATE_PREPARED")
             startCall.invoke()
         }
-
     }
 
 
@@ -274,9 +202,13 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         override fun onInfo(mp: MediaPlayer, what: Int, extra: Int): Boolean {
             if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                 // 播放器开始渲染
-                mCurrentState = STATE_PLAYING
-                mPlayerStatusListener.onPlayStateChanged(mCurrentState)
-                LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
+                if(mMediaPlayer.isPlaying){
+                    mCurrentState = STATE_PLAYING
+                    mPlayerStatusListener.onPlayStateChanged(mCurrentState)
+                    LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
+                }else{
+                    LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：视频暂停中 但是切换旋转回调了播放")
+                }
             } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
                 // MediaPlayer暂时不播放，以缓冲更多的数据
                 if (mCurrentState == STATE_PAUSED || mCurrentState == STATE_BUFFERING_PAUSED) {
@@ -320,42 +252,8 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
     private val mOnBufferingUpdateListener =
         MediaPlayer.OnBufferingUpdateListener { mp, percent -> mBufferPercentage = percent }
 
-
-    override fun isIdle(): Boolean {
-        return mCurrentState == STATE_IDLE
-    }
-
-    override fun isPreparing(): Boolean {
-        return mCurrentState == STATE_PREPARING
-    }
-
-    override fun isPrepared(): Boolean {
-        return mCurrentState == STATE_PREPARED
-    }
-
-    override fun isBufferingPlaying(): Boolean {
-        return mCurrentState == STATE_BUFFERING_PLAYING
-    }
-
-    override fun isBufferingPaused(): Boolean {
-        return mCurrentState == STATE_BUFFERING_PAUSED
-    }
-
     override fun isPlaying(): Boolean {
         return mMediaPlayer.isPlaying
     }
-
-    override fun isPaused(): Boolean {
-        return mCurrentState == STATE_PAUSED || isBufferingPaused()
-    }
-
-    override fun isError(): Boolean {
-        return mCurrentState == STATE_ERROR
-    }
-
-    override fun isCompleted(): Boolean {
-        return mCurrentState == STATE_COMPLETED
-    }
-
 
 }

@@ -1,5 +1,6 @@
 package com.pince.happy_media
 
+import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -14,19 +15,29 @@ class MainActivity : AppCompatActivity() {
 
 
         mHappyVideoPlayer.addController(DefaultController(this))
-        mHappyVideoPlayer.setUp(Uri.parse("https://media.w3.org/2010/05/sintel/trailer.mp4"), null, false)
+        mHappyVideoPlayer.setUp(
+            Uri.parse("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319212559089721.mp4"),
+            null,
+            true
+        )
+
+
+        button.setOnClickListener {
+            val i = Intent(this, FullActivity::class.java)
+            startActivity(i)
+        }
 
     }
 
 
     override fun onBackPressed() {
 
-        if(mHappyVideoPlayer.isTinyWindow()){
+        if (mHappyVideoPlayer.isTinyWindow()) {
             mHappyVideoPlayer.exitTinyWindow()
             return
         }
 
-        if(mHappyVideoPlayer.isFullScreen()){
+        if (mHappyVideoPlayer.isFullScreen()) {
             mHappyVideoPlayer.exitFullScreen()
             return
         }
