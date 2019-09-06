@@ -29,7 +29,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation depend.constraintLayout()
-    depend.appcompat_v7()
+    implementation depend.appcompat_v7()
     testImplementation 'junit:junit:4.12'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
