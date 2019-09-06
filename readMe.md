@@ -10,6 +10,7 @@
             android:id="@+id/mHappyVideoPlayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:engine ="ijkPlayer"
             app:loop="true"
             app:heightRatio="0.5625"
             app:isFromLastPosition="false"
@@ -27,6 +28,7 @@
  
 属性 | 默认值 |  功能  
 -|-|-
+engine | mediaPlayer |  mediaPlayer ->原生播放器　 ijkPlayer -> ijk引擎　|
 loop | false |  是否循环播放 |
 heightRatio | 0.0 |  　wrap_content（wrap_content默认控件高度按视频尺寸和控件宽度适应），heightRatio宽高比例如果设置，控件高度＝　宽度＊heightRatio|
 isFromLastPosition | false |  是否继续上一次退出时间点播放 |
@@ -60,7 +62,8 @@ centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸�
 　　
 　　　　
 
-        val audioPlayer = HappyPlayerHelper.newPlayer(context) //音频播放器（如果使用仅仅音频播放
+         HappyEngineFactor.newPlayer(context, engineType　（EngineType.MEDIA_PLAYER／EngineType.IJK_PLAYER）　)//音频播放器（如果使用仅仅音频播放
+        
         
         mHappyVideoPlayer.addController(DefaultController(this))　//视频播放器 设置控制器　(DefaultController　为默认控制器,如果要实现自己控制器ui，则继承IController)
         
