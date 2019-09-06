@@ -125,7 +125,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mTextureView.setCenterCropError(centerCropError)
         mTextureView.parentWindType = { mCurrentMode }
         mPlayerEngine.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener)
-        VideoPlayerManager.instance().currentVideoPlayer = this
         coverImg = textureContainer.findViewById(R.id.coverImg)
 
         mPlayerEngine.addPlayStatusListener(mediaPlayerListener, true)
@@ -481,7 +480,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         mOrientationDetector?.disable()
         mPlayerEngine.releasePlayer()
         mSurfaceTexture?.release()
-        VideoPlayerManager.instance().releaseVideoPlayer()
         mController?.detach()
     }
 
