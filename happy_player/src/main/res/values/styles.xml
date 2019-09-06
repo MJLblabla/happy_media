@@ -18,10 +18,10 @@
         <attr name="centerCropError"  format="float"/>
         <attr name="autoChangeOrientation" format="boolean"/>
 
-        <!--<attr name="cropType">-->
-            <!--<enum name="fitXy" value="1"/>-->
-            <!--<enum name="centerCrop" value="2"/>-->
-        <!--</attr>-->
+        <attr name="engine">
+            <enum name="mediaPlayer" value="1"/>
+            <enum name="ijkPlayer" value="2"/>
+        </attr>
     </declare-styleable>
 
 </resources>

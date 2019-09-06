@@ -18,6 +18,12 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
     protected var mCurrentState = PlayerStatus.STATE_IDLE
     private var isLossPause = false
 
+
+    companion object {
+        const val media_Player = 1
+        const val IJK_Player = 2
+    }
+
     private var audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener =
         AudioManager.OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
@@ -152,7 +158,12 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
 
     abstract fun setSurface(surface: Surface)
 
-    abstract fun setOnVideoSizeChangedListener(videoSizeChangedListener: MediaPlayer.OnVideoSizeChangedListener)
+    abstract fun setOnVideoSizeChangedListener(videoSizeChangedListener: OnVideoSizeChangedListener)
+
+    interface OnVideoSizeChangedListener{
+         fun onVideoSizeChanged(mp: AbsPlayerEngine, width: Int, height: Int)
+    }
+
 
     override fun isIdle(): Boolean {
         return mCurrentState == PlayerStatus.STATE_IDLE

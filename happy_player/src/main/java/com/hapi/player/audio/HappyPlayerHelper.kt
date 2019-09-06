@@ -2,7 +2,7 @@ package com.hapi.player.audio
 
 import android.content.Context
 import com.hapi.player.IPlayer
-import com.hapi.player.enegine.NativeEngine
+import com.hapi.player.engine.NativeEngine
 
 object HappyPlayerHelper {
 

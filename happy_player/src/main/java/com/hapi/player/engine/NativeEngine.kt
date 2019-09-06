@@ -1,4 +1,4 @@
-package com.hapi.player.enegine
+package com.hapi.player.engine
 
 import android.content.Context
 import android.media.AudioManager
@@ -8,12 +8,11 @@ import android.view.Surface
 import com.hapi.player.AbsPlayerEngine
 import com.hapi.player.PlayerStatus.*
 import com.hapi.player.utils.LogUtil
-import com.hapi.player.utils.PalyerUtil
 
 /**
  * 原生播放引擎
  */
-internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
+internal class NativeEngine(context: Context) : AbsPlayerEngine(context) {
 
     private var mUrl: Uri? = null
 
@@ -37,9 +36,14 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         m
     }
 
-    override fun setOnVideoSizeChangedListener(videoSizeChangedListener: MediaPlayer.OnVideoSizeChangedListener) {
-        mMediaPlayer.setOnVideoSizeChangedListener(videoSizeChangedListener)
+
+    override fun setOnVideoSizeChangedListener(videoSizeChangedListener: OnVideoSizeChangedListener) {
+
+        mMediaPlayer.setOnVideoSizeChangedListener { mp, width, height ->
+            videoSizeChangedListener.onVideoSizeChanged(this, width, height)
+        }
     }
+
 
     override fun setSurface(surface: Surface) {
         mMediaPlayer.setSurface(surface)
@@ -55,7 +59,7 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         mUrl = uir
         mHeaders = headers
         isUsePreLoad = preLoading
-        if(isUsePreLoad){
+        if (isUsePreLoad) {
             openMedia()
         }
     }
@@ -65,7 +69,7 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
             startCall.invoke()
             return
         }
-        if(mCurrentState == STATE_PRELOADING){
+        if (mCurrentState == STATE_PRELOADING) {
             isUsePreLoad = false
             mCurrentState = STATE_PREPARING
             mPlayerStatusListener.onPlayStateChanged(mCurrentState)
@@ -83,9 +87,9 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
             mMediaPlayer.stop()
             mMediaPlayer.reset()
             mMediaPlayer.isLooping = mPlayerConfig.loop
-            mCurrentState=  if(isUsePreLoad){
+            mCurrentState = if (isUsePreLoad) {
                 STATE_PRELOADING
-            }else{
+            } else {
                 STATE_PREPARING
             }
             mPlayerStatusListener.onPlayStateChanged(mCurrentState)
@@ -158,11 +162,11 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
 
     private val startCall = {
         reqestFouces()
-        isUsePreLoad=false
+        isUsePreLoad = false
         mMediaPlayer.start()
         // 从上次的保存位置播放
         if (continueFromLastPosition) {
-            val savedPlayPosition =getLastPosition()
+            val savedPlayPosition = getLastPosition()
             if (savedPlayPosition > 0) {
                 mMediaPlayer.seekTo(savedPlayPosition.toInt())
             }
@@ -203,11 +207,11 @@ internal class NativeEngine(  context: Context) : AbsPlayerEngine(context) {
         override fun onInfo(mp: MediaPlayer, what: Int, extra: Int): Boolean {
             if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                 // 播放器开始渲染
-                if(mMediaPlayer.isPlaying){
+                if (mMediaPlayer.isPlaying) {
                     mCurrentState = STATE_PLAYING
                     mPlayerStatusListener.onPlayStateChanged(mCurrentState)
                     LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
-                }else{
+                } else {
                     LogUtil.d("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：视频暂停中 但是切换旋转回调了播放")
                 }
             } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {

@@ -19,13 +19,12 @@
 
 
     <com.hapi.player.video.LifecycleVideoView
-
             android:id="@+id/mHappyVideoPlayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:loop="true"
-
+            app:engine ="ijkPlayer"
             app:isFromLastPosition="false"
             app:isUseCache="true"
             app:isFirstFrameAsCover="true"
