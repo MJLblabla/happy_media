@@ -25,7 +25,7 @@ android {
 
 dependencies {
 
-    implementation project(":happy_player")
+//    implementation project(":happy_player")
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation depend.constraintLayout()
