@@ -1,8 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'hapidepend'
+apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion depend.compileSdkVersion
     defaultConfig {
@@ -44,9 +44,8 @@ dependencies {
     // Other ABIs: optional
     implementation 'tv.danmaku.ijk.media:ijkplayer-armv5:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8'
-//    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
-//    implementation 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.8'
+
 
     // ExoPlayer as IMediaPlayer: optional, experimental
-   // implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
 }

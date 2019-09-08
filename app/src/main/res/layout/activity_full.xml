@@ -11,7 +11,7 @@
 
 
 
-    <com.hapi.player.video.HappyVideoPlayer
+    <com.hapi.player.video.LifecycleVideoView
 
             android:id="@+id/mHappyVideoPlayer"
             android:layout_width="match_parent"

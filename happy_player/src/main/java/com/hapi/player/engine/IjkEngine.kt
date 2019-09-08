@@ -6,6 +6,7 @@ import android.net.Uri
 import android.view.Surface
 import com.hapi.player.AbsPlayerEngine
 import com.hapi.player.PlayerStatus
+import com.hapi.player.PlayerStatus.STATE_PRELOADED_WAITING
 import com.hapi.player.utils.LogUtil
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
@@ -235,21 +236,21 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
         override fun onInfo(mp: IMediaPlayer, what: Int, extra: Int): Boolean {
             if (what == IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                 // 播放器开始渲染
-                if (mIMediaPlayer.isPlaying) {
                     mCurrentState = PlayerStatus.STATE_PLAYING
                     mPlayerStatusListener.onPlayStateChanged(mCurrentState)
                     LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
-                } else {
-                    LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：视频暂停中 但是切换旋转回调了播放")
-                }
             } else if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_START) {
                 // IMediaPlayer暂时不播放，以缓冲更多的数据
                 if (mCurrentState == PlayerStatus.STATE_PAUSED || mCurrentState == PlayerStatus.STATE_BUFFERING_PAUSED) {
                     mCurrentState = PlayerStatus.STATE_BUFFERING_PAUSED
                     LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_BUFFERING_START：STATE_BUFFERING_PAUSED")
                 } else {
-                    mCurrentState = PlayerStatus.STATE_BUFFERING_PLAYING
-                    LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_BUFFERING_START：STATE_BUFFERING_PLAYING")
+
+                    //ijk　回调　在异步准备完成　没有开始　就给这个缓冲　不需要
+                    if(mCurrentState!=STATE_PRELOADED_WAITING){
+                        mCurrentState = PlayerStatus.STATE_BUFFERING_PLAYING
+                        LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_BUFFERING_START：STATE_BUFFERING_PLAYING")
+                    }
                 }
                 mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             } else if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_END) {
