@@ -357,9 +357,7 @@ interface IVideoPlayer : IPlayer {
 }
 
 
-**混淆配置**
-     
-     -keep public class com.hapi.player.been.**{*;}　
+
 
 
 
