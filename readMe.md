@@ -5,7 +5,6 @@
 
 
 **使用简介**
-
            <com.hapi.player.video.HappyVideoPlayer
             android:id="@+id/mHappyVideoPlayer"
             android:layout_width="match_parent"
@@ -19,9 +18,6 @@
             app:centerCropError="0.1"
             app:autoChangeOrientation ="true"
            />
-
-
-
 
 **属性**
 
