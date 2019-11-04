@@ -14,6 +14,7 @@
             app:heightRatio="0.5625"
             app:isFromLastPosition="false"
             app:isUseCache="true"
+
             app:isFirstFrameAsCover="true"
             app:centerCropError="0.1"
             app:autoChangeOrientation ="true"
