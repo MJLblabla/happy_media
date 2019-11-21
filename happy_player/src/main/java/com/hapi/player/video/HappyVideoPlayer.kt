@@ -10,7 +10,6 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
-import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -20,16 +19,12 @@ import com.hapi.player.*
 import com.hapi.player.PlayerStatus.*
 import com.hapi.player.engine.EngineType
 import com.hapi.player.engine.HappyEngineFactor
-import com.hapi.player.engine.NativeEngine
 import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
 import com.hapi.player.video.contronller.IController
 import com.hapi.player.video.floating.Floating
 import com.hapi.player.video.floating.TinyFloatView
-import com.hapi.player.utils.MediaMetadataRetrieverUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+
 
 
 open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceTextureListener {
