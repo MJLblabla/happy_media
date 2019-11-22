@@ -5,25 +5,25 @@
 
 
 **使用简介**
-           <com.hapi.player.video.HappyVideoPlayer
-            android:id="@+id/mHappyVideoPlayer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:engine ="ijkPlayer"
-            app:loop="true"
-            app:heightRatio="0.5625"
-            app:isFromLastPosition="false"
-            app:isUseCache="true"
 
-            app:isFirstFrameAsCover="true"
-            app:centerCropError="0.1"
-            app:autoChangeOrientation ="true"
-           />
+       <com.hapi.player.video.HappyVideoPlayer
+        android:id="@+id/mHappyVideoPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:engine ="ijkPlayer"
+        app:loop="true"
+        app:heightRatio="0.5625"
+        app:isFromLastPosition="false"
+        app:isUseCache="true"
+        app:isFirstFrameAsCover="true"
+        app:centerCropError="0.1"
+        app:autoChangeOrientation ="true"
+       />
 
 **属性**
 
- 
-属性 | 默认值 |  功能  
+
+属性 | 默认值 |  功能
 -|-|-
 engine | mediaPlayer |  mediaPlayer ->原生播放器　 ijkPlayer -> ijk引擎　|
 loop | false |  是否循环播放 |
@@ -42,16 +42,20 @@ centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸�
     	allprojects {
 		repositories {
 			...
-			maven { url 'https://jitpack.io' }
+		//	maven { url 'https://jitpack.io' }
 		}
 	}
-	
+
 
     	dependencies {
-	        implementation 'com.github.MJLblabla:happy_media:Tag'
+	         implementation 'com.pince.maven:lib-player:1.0.2'
 	}
-	
-	
+
+	#ijkplayer
+-keep class tv.danmaku.ijk.media.player.** {*;}
+-keep class tv.danmaku.ijk.media.player.IjkMediaPlayer{*;}
+-keep class tv.danmaku.ijk.media.player.ffmpeg.FFmpegApi{*;}
+
 	
 	
 
