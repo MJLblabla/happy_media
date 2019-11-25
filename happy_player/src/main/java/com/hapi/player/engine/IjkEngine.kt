@@ -92,7 +92,7 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
     override fun setOnVideoSizeChangedListener(videoSizeChangedListener: OnVideoSizeChangedListener) {
 
         mIMediaPlayer.setOnVideoSizeChangedListener { p0, p1, p2, p3, p4 ->
-            videoSizeChangedListener.onVideoSizeChanged(this,p1,p2)
+            videoSizeChangedListener.onVideoSizeChanged(this,p2,p1)
         }
     }
 
