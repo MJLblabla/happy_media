@@ -35,6 +35,9 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
         m.setOption(1, "flush_packets", 1L)
         m.setOption(4, "packet-buffering", 0L)
         m.setOption(4, "framedrop", 1L)
+        m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 1);
+        m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 1);
+        m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 1);
         m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1)
         m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
         m.setAudioStreamType(AudioManager.STREAM_MUSIC)
@@ -92,7 +95,7 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
     override fun setOnVideoSizeChangedListener(videoSizeChangedListener: OnVideoSizeChangedListener) {
 
         mIMediaPlayer.setOnVideoSizeChangedListener { p0, p1, p2, p3, p4 ->
-            videoSizeChangedListener.onVideoSizeChanged(this,p2,p1)
+            videoSizeChangedListener.onVideoSizeChanged(this,p1,p2)
         }
     }
 
