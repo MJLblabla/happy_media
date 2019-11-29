@@ -147,9 +147,9 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                 LayoutInflater.from(context)
                         .inflate(R.layout.layout_texture_container, mContainer, false) as TextureContainer
         mContainer.addView(textureContainer)
-        textureContainer.parentWindType = { mCurrentMode }
-        textureContainer.tagNam = tagNam + "textureContainer"
-        textureContainer.setCenterCropError(centerCropError)
+
+
+
         mFloating = Floating(PalyerUtil.scanForActivity(context))
         mTextureView = textureContainer.findViewById(R.id.mTextureView)
         mTextureView.surfaceTextureListener = this
@@ -173,6 +173,14 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
             }
             mOrientationDetector?.isEnable = false
         }
+
+        mTextureView.parentWindType = { mCurrentMode }
+        mTextureView.tagNam = tagNam + "textureContainer"
+        mTextureView.setCenterCropError(centerCropError)
+
+        coverImg.parentWindType = { mCurrentMode }
+        coverImg.tagNam = tagNam + "textureContainer"
+        coverImg.setCenterCropError(centerCropError)
     }
 
     private var mediaPlayerListener = object : PlayerStatusListener {
@@ -235,7 +243,9 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                             val tempVideoHeightRatio = resource.height / resource.width.toFloat()
                             if (tempVideoHeightRatio != videoHeightRatio) {
                                 videoHeightRatio = tempVideoHeightRatio
-                                textureContainer.adaptVideoSize(resource.width, resource.height)
+
+                                coverImg.adaptVideoSize(resource.width, resource.height)
+                                mTextureView.adaptVideoSize(resource.width, resource.height)
                             }
                         }
                         coverImg.setImageBitmap(resource)
@@ -244,6 +254,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
     }
 
     override fun setUp(uir: Uri, headers: Map<String, String>?, cover: Uri, preLoading: Boolean) {
+        coverImg.isFirstFragme = false
         setCover(cover)
         onSetUp(uir, headers, preLoading)
     }
@@ -261,6 +272,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
     override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
         if (isFirstFrameAsCover) {
+            coverImg.isFirstFragme = true
             setCover(uir)
         }
 
@@ -455,12 +467,18 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
 
     private val mOnVideoSizeChangedListener = object : AbsPlayerEngine.OnVideoSizeChangedListener {
+        override fun onRotationInfo(rotation: Float) {
+            textureContainer.setRotation(rotation)
+            coverImg.setRotation(rotation)
+        }
+
         override fun onVideoSizeChanged(mp: AbsPlayerEngine, width: Int, height: Int) {
             if (width > 0 && height > 0) {
 
                 val tempVideoHeightRatio = height.toFloat() / width
                 videoHeightRatio = tempVideoHeightRatio
-                textureContainer.adaptVideoSize(width, height)
+                mTextureView.adaptVideoSize(width, height)
+                coverImg.adaptVideoSize(width, height)
             }
             LogUtil.d(tagNam + "onVideoSizeChanged ——> width：$width， height：$height")
         }

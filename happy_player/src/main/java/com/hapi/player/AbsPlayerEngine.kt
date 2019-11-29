@@ -156,10 +156,11 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
 
     abstract fun setOnVideoSizeChangedListener(videoSizeChangedListener: OnVideoSizeChangedListener)
 
-    interface OnVideoSizeChangedListener{
-         fun onVideoSizeChanged(mp: AbsPlayerEngine, width: Int, height: Int)
-    }
 
+    interface OnVideoSizeChangedListener{
+        fun onVideoSizeChanged(mp: AbsPlayerEngine, width: Int, height: Int)
+        fun onRotationInfo(rotation:Float);
+    }
 
     override fun isIdle(): Boolean {
         return mCurrentState == PlayerStatus.STATE_IDLE

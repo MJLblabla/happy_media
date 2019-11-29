@@ -6,7 +6,6 @@ import android.net.Uri
 import android.view.Surface
 import com.hapi.player.AbsPlayerEngine
 import com.hapi.player.PlayerStatus
-import com.hapi.player.PlayerStatus.STATE_PRELOADED_WAITING
 import com.hapi.player.utils.LogUtil
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
@@ -29,22 +28,23 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
      * 原生 播放器
      */
     private val mIMediaPlayer: IjkMediaPlayer by lazy {
-            val m = IjkMediaPlayer()
+        val m = IjkMediaPlayer()
         m.setOption(1, "analyzemaxduration", 100L)
         m.setOption(1, "probesize", 10240L)
         m.setOption(1, "flush_packets", 1L)
         m.setOption(4, "packet-buffering", 0L)
         m.setOption(4, "framedrop", 1L)
-        m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 0);
+
+
         m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1)
         m.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
+
         m.setAudioStreamType(AudioManager.STREAM_MUSIC)
         m.setOnPreparedListener(mOnPreparedListener)
         m.setOnCompletionListener(mOnCompletionListener)
         m.setOnErrorListener(mOnErrorListener)
         m.setOnInfoListener(mOnInfoListener)
         m.setOnBufferingUpdateListener(mOnBufferingUpdateListener)
-
         m
     }
 
@@ -90,8 +90,9 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
     }
 
 
+    private var mVideoSizeChangedListener :OnVideoSizeChangedListener?=null
     override fun setOnVideoSizeChangedListener(videoSizeChangedListener: OnVideoSizeChangedListener) {
-
+        mVideoSizeChangedListener = videoSizeChangedListener
         mIMediaPlayer.setOnVideoSizeChangedListener { p0, p1, p2, p3, p4 ->
             videoSizeChangedListener.onVideoSizeChanged(this,p1,p2)
         }
@@ -237,21 +238,21 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
         override fun onInfo(mp: IMediaPlayer, what: Int, extra: Int): Boolean {
             if (what == IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                 // 播放器开始渲染
+                if (mIMediaPlayer.isPlaying) {
                     mCurrentState = PlayerStatus.STATE_PLAYING
                     mPlayerStatusListener.onPlayStateChanged(mCurrentState)
                     LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
+                } else {
+                    LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：视频暂停中 但是切换旋转回调了播放")
+                }
             } else if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_START) {
                 // IMediaPlayer暂时不播放，以缓冲更多的数据
                 if (mCurrentState == PlayerStatus.STATE_PAUSED || mCurrentState == PlayerStatus.STATE_BUFFERING_PAUSED) {
                     mCurrentState = PlayerStatus.STATE_BUFFERING_PAUSED
                     LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_BUFFERING_START：STATE_BUFFERING_PAUSED")
                 } else {
-
-                    //ijk　回调　在异步准备完成　没有开始　就给这个缓冲　不需要
-                    if(mCurrentState!=STATE_PRELOADED_WAITING){
-                        mCurrentState = PlayerStatus.STATE_BUFFERING_PLAYING
-                        LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_BUFFERING_START：STATE_BUFFERING_PLAYING")
-                    }
+                    mCurrentState = PlayerStatus.STATE_BUFFERING_PLAYING
+                    LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_BUFFERING_START：STATE_BUFFERING_PLAYING")
                 }
                 mPlayerStatusListener.onPlayStateChanged(mCurrentState)
             } else if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_END) {
@@ -267,13 +268,14 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
                     LogUtil.d(tagNam + "onInfo ——> MEDIA_INFO_BUFFERING_END： STATE_PAUSED")
                 }
             }
-//            else if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
-//                // 视频旋转了extra度，需要恢复
+            else if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
+                // 视频旋转了extra度，需要恢复
 //                if (mTextureView != null) {
 //                    mTextureView.setRotation(extra)
 //                    LogUtil.d(tagNam+"视频旋转角度：$extra")
 //                }
-//            }
+                mVideoSizeChangedListener?.onRotationInfo(extra.toFloat())
+            }
 //
             else if (what == IMediaPlayer.MEDIA_INFO_NOT_SEEKABLE) {
                 LogUtil.d(tagNam + "视频不能seekTo，为直播视频")
@@ -285,7 +287,7 @@ class IjkEngine(context: Context) : AbsPlayerEngine(context) {
     }
 
     private val mOnBufferingUpdateListener =
-            IMediaPlayer.OnBufferingUpdateListener { mp, percent -> mBufferPercentage = percent }
+        IMediaPlayer.OnBufferingUpdateListener { mp, percent -> mBufferPercentage = percent }
 
     override fun isPlaying(): Boolean {
         return mIMediaPlayer.isPlaying
