@@ -468,7 +468,7 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
     private val mOnVideoSizeChangedListener = object : AbsPlayerEngine.OnVideoSizeChangedListener {
         override fun onRotationInfo(rotation: Float) {
-            textureContainer.setRotation(rotation)
+            mTextureView.setRotation(rotation)
             coverImg.setRotation(rotation)
         }
 
