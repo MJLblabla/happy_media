@@ -36,7 +36,7 @@ centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸�
 
 
 ----------
-
+[![](https://jitpack.io/v/MJLblabla/happy_media.svg)](https://jitpack.io/#MJLblabla/happy_media)
 **导入**
 
     	allprojects {
@@ -48,7 +48,7 @@ centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸�
 
 
     	dependencies {
-	         implementation 'com.pince.maven:lib-player:1.0.2'
+	        implementation 'com.github.MJLblabla:happy_media:Tag'
 	}
 
 	#ijkplayer
