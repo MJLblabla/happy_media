@@ -1,5 +1,5 @@
 ﻿## **happy_media** ## 快速开启音视频播放
-**功能简介**　音频播放，视频全屏\小窗切换播放，缓存播放，横竖屏幕随系统，视频自适应
+**功能简介**　音频播放，视频全屏\小窗切换播放，横竖屏幕随系统，视频自适应
 
 
 
@@ -14,7 +14,7 @@
         app:loop="true"
         app:heightRatio="0.5625"
         app:isFromLastPosition="false"
-        app:isUseCache="true"
+
         app:isFirstFrameAsCover="true"
         app:centerCropError="0.1"
         app:autoChangeOrientation ="true"
@@ -29,7 +29,7 @@ engine | mediaPlayer |  mediaPlayer ->原生播放器　 ijkPlayer -> ijk引擎�
 loop | false |  是否循环播放 |
 heightRatio | 0.0 |  　wrap_content（wrap_content默认控件高度按视频尺寸和控件宽度适应），heightRatio宽高比例如果设置，控件高度＝　宽度＊heightRatio|
 isFromLastPosition | false |  是否继续上一次退出时间点播放 |
-isUseCache | false |  是否变下边播 |
+
 autoChangeOrientation | false |  　播放后，全屏和非全屏是否跟随手机旋转而切换 |
 isFirstFrameAsCover | false |  是否用第一帧作为封面 |
 centerCropError | false |  　非全屏播放时（视频尺寸和控件尺寸不黄金比例时，比如固定控件大小和match_parent,视频缩调整后会有小黑边）　如果宽度和高度小黑边在多少比例内，无视它使用centerCrop去充满屏幕，（比如竖屏视频抖音这类还是没有小黑边好） |
