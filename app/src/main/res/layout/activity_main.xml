@@ -26,7 +26,6 @@
             app:loop="true"
             app:engine ="ijkPlayer"
             app:isFromLastPosition="false"
-            app:isUseCache="true"
             app:isFirstFrameAsCover="true"
             app:centerCropError="0.1"
             app:autoChangeOrientation ="true"

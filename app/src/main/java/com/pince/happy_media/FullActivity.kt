@@ -12,7 +12,7 @@ class FullActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_full)
         mHappyVideoPlayer.addController(DefaultController(this))
-        mHappyVideoPlayer.setUp(Uri.parse("https://cdn.static.orzzhibo.com/20190936/d0c134694343d1a83044ffa84afc4972.mp4"), null, true)
+        mHappyVideoPlayer.setUp(Uri.parse("https://stream7.iqilu.com/10339/upload_transcode/202002/09/20200209105011F0zPoYzHry.mp4"), null, true)
         lifecycle.addObserver(mHappyVideoPlayer)
     }
 

@@ -14,10 +14,7 @@ class PlayerConfig {
      */
     internal var isFromLastPosition = false
 
-    /**
-     * 是否使用　边播边缓存
-     */
-    internal var isUseCache = false
+
 
 
     fun setLoop(loop: Boolean): PlayerConfig {
@@ -30,8 +27,4 @@ class PlayerConfig {
         return this
     }
 
-    fun setUseCache(isUseCache: Boolean): PlayerConfig {
-        this.isUseCache = isUseCache
-        return this
-    }
 }

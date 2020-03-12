@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.hapi.player.cache.HttpProxyCacheManager
 import com.hapi.player.video.contronller.DefaultController
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -14,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        HttpProxyCacheManager.getHttpProxyCacheManager()
+
         val ctroller = DefaultController(this)
 
         mHappyVideoPlayer.addController(ctroller)

@@ -19,7 +19,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:loop="true"
             app:isFromLastPosition="false"
-            app:isUseCache="true"
+
             app:isFirstFrameAsCover="true"
             app:centerCropError="0.2"
             app:autoChangeOrientation ="true"

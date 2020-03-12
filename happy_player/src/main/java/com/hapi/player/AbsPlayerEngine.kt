@@ -3,11 +3,8 @@ package com.hapi.player
 
 import android.content.Context
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.net.Uri
 import android.view.Surface
-import com.hapi.player.cache.HttpProxyCacheManager
-import com.hapi.player.utils.LogUtil
 import com.hapi.player.utils.PalyerUtil
 
 abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
@@ -85,18 +82,9 @@ abstract class AbsPlayerEngine(protected val context: Context) : IPlayer {
 
     final override fun setUp(uir: Uri, headers: Map<String, String>?, preLoading: Boolean) {
         val str = uir.toString()
-//        val proxyUrl = uir
-        val proxyUrl = if (str.startsWith("http") && mPlayerConfig.isUseCache) {
-            val proxy = HttpProxyCacheManager.getHttpProxyCacheManager()
-                .getProxy(context.applicationContext)
-            val proxyUrl = proxy.getProxyUrl(str)
-            LogUtil.d(tagNam+"setUp  proxyUrl  $proxyUrl")
-            Uri.parse(proxyUrl)
-        } else {
-            uir
-        }
+
         originUri = uir
-        setUpAfterDealUrl(proxyUrl, headers, preLoading)
+        setUpAfterDealUrl(uir, headers, preLoading)
     }
 
     protected fun reqestFouces() {

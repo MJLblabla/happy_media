@@ -86,7 +86,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
 
         var isFromLastPosition = false
         var loop = false
-        var cache = false
         attrs?.let {
             val typedArray = context?.obtainStyledAttributes(attrs, R.styleable.happyVideo)
             typedArray?.apply {
@@ -105,7 +104,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
                 isFromLastPosition =
                         getBoolean(R.styleable.happyVideo_isFromLastPosition, false)
                 loop = getBoolean(R.styleable.happyVideo_loop, false)
-                cache = getBoolean(R.styleable.happyVideo_isUseCache, false)
                 autoChangeOrientation =
                         getBoolean(R.styleable.happyVideo_autoChangeOrientation, false)
                 isFirstFrameAsCover = getBoolean(R.styleable.happyVideo_isFirstFrameAsCover, false)
@@ -118,7 +116,6 @@ open class HappyVideoPlayer : FrameLayout, IVideoPlayer, TextureView.SurfaceText
         val config = mPlayerEngine.getPlayerConfig()
         config.setFromLastPosition(isFromLastPosition)
                 .setLoop(loop)
-                .setUseCache(cache)
         mPlayerEngine.setPlayerConfig(config)
         init()
     }
