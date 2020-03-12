@@ -16,11 +16,11 @@ public class HttpProxyCacheManager {
 
     private HttpProxyCacheServer proxy = null;
 
-    public static HttpProxyCacheManager getHttpProxyCacheManager() {
+    private static HttpProxyCacheManager getHttpProxyCacheManager() {
         return Holder.instance;
     }
 
-    public static class Holder {
+    private static class Holder {
         private static HttpProxyCacheManager instance = new HttpProxyCacheManager();
     }
 
